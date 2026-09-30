@@ -4,433 +4,558 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111827">
-  <title>Highway Bites | Admin</title>
+  <meta name="description" content="Order delicious burgers, pizza and more from Highway Bites.">
+  <title>Highway Bites | Good food. Great pit stop.</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { theme: { extend: { colors: { brand: { DEFAULT: '#f97316', dark: '#ea580c' } } } } };</script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: { DEFAULT: '#f97316', dark: '#ea580c', cream: '#fff7ed' } },
+          fontFamily: { display: ['Georgia', 'serif'] },
+          boxShadow: { card: '0 16px 45px rgba(17, 24, 39, .08)' }
+        }
+      }
+    };
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <style>body{font-family:'DM Sans',sans-serif}.toast{animation:appear .2s ease-out}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .display { font-family: 'Playfair Display', Georgia, serif; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { scrollbar-width: none; }
+    .hero-pattern { background-image: radial-gradient(rgba(255,255,255,.1) 1px, transparent 1px); background-size: 18px 18px; }
+    .toast { animation: toast-in .22s ease-out; }
+    @keyframes toast-in { from { transform: translateY(12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  </style>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900">
-  <div id="login-screen" class="grid min-h-screen place-items-center bg-gray-950 px-4 py-10">
-    <form id="login-form" class="w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl">
-      <a href="index.html" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brand"><i class="fa-solid fa-arrow-left"></i> Back to Highway Bites</a>
-      <div class="mt-8 grid h-14 w-14 place-items-center rounded-2xl bg-orange-100 text-2xl text-brand"><i class="fa-solid fa-burger"></i></div>
-      <p class="mt-5 text-xs font-extrabold uppercase tracking-[.2em] text-brand">Highway Bites</p><h1 class="mt-1 text-3xl font-extrabold">Admin sign in</h1><p class="mt-2 text-sm text-gray-500">Sign in with the administrator email and password created in Supabase Auth.</p>
-      <label class="mt-6 block text-sm font-bold" for="admin-email">Email</label>
-      <input id="admin-email" type="email" autocomplete="username" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="admin@example.com">
-      <label class="mt-4 block text-sm font-bold" for="admin-password">Password</label>
-      <input id="admin-password" type="password" autocomplete="current-password" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="Your admin password">
-      <p id="login-error" class="mt-3 hidden text-sm font-semibold text-red-600"></p>
-      <button class="mt-5 w-full rounded-xl bg-gray-900 px-4 py-3.5 font-extrabold text-white hover:bg-brand">Sign in <i class="fa-solid fa-arrow-right ml-2"></i></button>
-      <p class="mt-5 rounded-xl bg-orange-50 p-3 text-xs leading-5 text-gray-600">Admin accounts must be created in Supabase Authentication and explicitly authorized in the <code>admin_users</code> table. Public visitors cannot create an admin account.</p>
-    </form>
-  </div>
-
-  <div id="admin-app" class="hidden min-h-screen">
-    <header class="sticky top-0 z-20 border-b border-gray-200 bg-white/95 backdrop-blur">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        <a href="index.html" class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-xl bg-brand text-white"><i class="fa-solid fa-burger"></i></span><span class="font-extrabold">Highway <span class="text-brand">Bites</span><small class="block text-[10px] font-bold uppercase tracking-widest text-gray-400">Admin dashboard</small></span></a>
-        <div class="flex items-center gap-3"><span id="connection" class="hidden items-center gap-2 text-xs font-bold text-gray-500 sm:flex"><span class="h-2 w-2 rounded-full bg-gray-300"></span>Connecting</span><button id="logout" class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-bold hover:bg-gray-50"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i>Sign out</button></div>
+<body class="min-h-screen bg-[#fffdfa] text-gray-900">
+  <header class="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <a href="#" class="flex items-center gap-3" aria-label="Highway Bites home">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-orange-200"><i class="fa-solid fa-burger text-xl"></i></span>
+        <span><span class="block text-lg font-extrabold tracking-tight">Highway <span class="text-brand">Bites</span></span><span class="block text-[10px] font-bold uppercase tracking-[.2em] text-gray-400">Good food. Great pit stop.</span></span>
+      </a>
+      <nav class="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
+        <a class="hover:text-brand" href="#menu">Our menu</a><button id="my-orders-open" class="hover:text-brand">My orders</button><a class="hover:text-brand" href="#why-us">Why Highway Bites</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button id="my-orders-open-mobile" class="grid h-10 w-10 place-items-center rounded-full border border-gray-200 text-gray-700 transition hover:border-brand hover:text-brand md:hidden" aria-label="My orders"><i class="fa-solid fa-receipt"></i></button>
+        <button id="cart-open" class="relative inline-flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand" aria-label="Open shopping cart">
+          <i class="fa-solid fa-bag-shopping"></i><span class="hidden sm:inline">Your cart</span><span id="cart-count" class="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px]">0</span>
+        </button>
       </div>
-    </header>
-    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div class="flex flex-wrap items-end justify-between gap-4"><div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Your cafe, at a glance</p><h1 class="mt-1 text-3xl font-extrabold">Dashboard</h1><p class="mt-1 text-sm text-gray-500">Orders update live. New order alerts play a sound.</p></div><button id="refresh-orders" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold hover:border-brand"><i class="fa-solid fa-rotate-right mr-2"></i>Refresh orders</button></div>
-      <div class="mt-6 grid gap-4 sm:grid-cols-3"><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Active orders</p><p id="active-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Today's orders</p><p id="today-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Today's sales</p><p id="today-sales" class="mt-1 text-3xl font-extrabold">₹0</p></div></div>
-      <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1.4fr_.8fr]">
-        <section class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4"><div><h2 class="text-lg font-extrabold">Live orders</h2><p class="text-xs text-gray-500">Newest orders appear first</p></div><select id="order-filter" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold"><option value="active">Active orders</option><option value="all">All orders</option><option value="completed">Completed / cancelled</option></select></div>
-          <div id="orders-list" class="divide-y divide-gray-100"></div>
-          <div id="orders-empty" class="hidden px-5 py-14 text-center"><span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-orange-50 text-xl text-brand"><i class="fa-solid fa-receipt"></i></span><p class="mt-3 font-bold">No orders to show</p><p class="mt-1 text-sm text-gray-500">Incoming orders will appear here automatically.</p></div>
-        </section>
-        <div class="space-y-6">
-          <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-extrabold">Delivery team</h2>
-            <p class="mt-1 text-xs leading-5 text-gray-500">Create your two drivers in Supabase Dashboard → Authentication → Users → Add user. Copy each new user ID here. Drivers can only see orders assigned to their account.</p>
-            <form id="delivery-team-form" class="mt-4 space-y-3">
-              <label class="block text-sm font-bold">Auth user ID<input id="delivery-user-id" required maxlength="36" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal outline-none focus:border-brand" placeholder="UUID from Supabase Auth"></label>
-              <div class="grid grid-cols-2 gap-2"><label class="block text-sm font-bold">Driver name<input id="delivery-user-name" required maxlength="100" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal outline-none focus:border-brand"></label><label class="block text-sm font-bold">Phone<input id="delivery-user-phone" type="tel" maxlength="20" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal outline-none focus:border-brand"></label></div>
-              <button class="w-full rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-bold text-white hover:bg-brand">Add / update driver</button>
-            </form>
-            <div id="delivery-team-list" class="mt-3 divide-y divide-gray-100"></div>
-          </section>
-          <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between"><div><h2 class="text-lg font-extrabold">Menu items</h2><p class="text-xs text-gray-500">Add, edit or pause a dish</p></div><button id="add-menu" class="rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark"><i class="fa-solid fa-plus mr-1"></i>Add item</button></div>
-            <div id="menu-admin-list" class="mt-4 max-h-[30rem] divide-y divide-gray-100 overflow-y-auto"></div>
-          </section>
-          <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-extrabold">Payment settings</h2><p class="mt-1 text-xs text-gray-500">UPI details shown to customers at checkout</p>
-            <form id="settings-form" class="mt-4 space-y-3">
-              <label class="block text-sm font-bold">UPI ID<input id="setting-upi" maxlength="100" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-normal outline-none focus:border-brand" placeholder="yourname@bank"></label>
-              <label class="flex items-center gap-2 text-sm font-semibold"><input id="setting-cod-enabled" type="checkbox" class="h-4 w-4 accent-orange-500">Accept cash on delivery</label>
-              <label class="flex items-center gap-2 text-sm font-semibold"><input id="setting-upi-enabled" type="checkbox" class="h-4 w-4 accent-orange-500">Accept UPI payments</label>
-              <label class="block text-sm font-bold">Upload payment QR code<input id="setting-qr-file" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1.5 block w-full rounded-lg border border-gray-200 px-3 py-2.5 text-xs font-normal"></label>
-              <input id="setting-qr" type="hidden">
-              <div id="qr-preview-wrap" class="hidden rounded-xl bg-gray-50 p-3 text-center"><img id="qr-preview" class="mx-auto h-32 w-32 object-contain" alt="Current payment QR preview"></div>
-              <button class="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-extrabold text-white hover:bg-brand">Save payment settings</button>
-            </form>
-          </section>
+    </div>
+  </header>
+
+  <main>
+    <section class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div class="hero-pattern relative overflow-hidden rounded-[2rem] bg-gray-950 text-white">
+        <div class="absolute -right-16 -top-24 h-80 w-80 rounded-full bg-brand/30 blur-3xl"></div>
+        <div class="relative grid items-center gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.1fr_.9fr] lg:px-16">
+          <div class="max-w-xl">
+            <span class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-orange-200"><i class="fa-solid fa-sparkles"></i> Fresh off the grill</span>
+            <h1 class="display text-4xl font-extrabold leading-tight sm:text-6xl">Big cravings.<br><span class="text-brand">Bigger bites.</span></h1>
+            <p class="mt-5 max-w-md text-base leading-7 text-gray-300">Road-trip favorites, made fresh and served with a little extra love. Your next great pit stop starts here.</p>
+            <a href="#menu" class="mt-8 inline-flex items-center gap-3 rounded-full bg-brand px-6 py-3.5 font-extrabold text-white shadow-lg shadow-orange-950/30 transition hover:-translate-y-0.5 hover:bg-brand-dark">Explore the menu <i class="fa-solid fa-arrow-right"></i></a>
+            <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-300"><span><i class="fa-solid fa-star mr-1.5 text-yellow-400"></i>Made fresh to order</span><span><i class="fa-solid fa-location-dot mr-1.5 text-brand"></i>Good vibes, great food</span></div>
+          </div>
+          <div class="relative mx-auto w-full max-w-lg">
+            <div class="absolute inset-8 rounded-full bg-brand/25 blur-3xl"></div>
+            <img class="relative aspect-[4/3] w-full rounded-[1.75rem] object-cover shadow-2xl ring-1 ring-white/10" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1000&q=85" alt="Juicy Highway Bites burger with fresh toppings">
+            <div class="absolute -bottom-4 -left-2 rounded-2xl bg-white px-4 py-3 text-gray-900 shadow-xl sm:-left-6"><div class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-brand"><i class="fa-solid fa-fire"></i></span><span><strong class="block text-sm">Flame grilled</strong><span class="text-xs text-gray-500">Always fresh, never boring</span></span></div></div>
+          </div>
         </div>
       </div>
-    </main>
+    </section>
+
+    <section id="why-us" class="mx-auto grid max-w-7xl gap-3 px-4 py-7 sm:grid-cols-3 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-leaf"></i></span><span><b class="block text-sm">Fresh ingredients</b><small class="text-gray-500">Goodness in every bite</small></span></div>
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-bolt"></i></span><span><b class="block text-sm">Made when you order</b><small class="text-gray-500">Hot, delicious, just for you</small></span></div>
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-heart"></i></span><span><b class="block text-sm">A little extra love</b><small class="text-gray-500">From our kitchen to your table</small></span></div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-orange-100 bg-orange-50 p-5 sm:p-7">
+        <div class="sm:col-span-2">
+          <p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Already ordered?</p>
+          <h2 class="mt-1 text-xl font-extrabold">Check your order updates</h2>
+          <p class="mt-1 text-sm text-gray-600">View your saved orders and their current status.</p>
+        </div>
+        <button id="my-orders-open-banner" type="button" class="shrink-0 rounded-xl bg-gray-900 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-brand"><i class="fa-solid fa-receipt mr-2"></i>My orders</button>
+      </div>
+    </section>
+
+    <div id="my-orders-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-gray-950/55 p-4" role="dialog" aria-modal="true" aria-labelledby="my-orders-title">
+      <section class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-[#fffdfa] shadow-2xl">
+        <header class="flex items-start justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+          <div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Your meal, step by step</p><h2 id="my-orders-title" class="mt-1 text-2xl font-extrabold">My orders</h2><p class="mt-1 text-sm text-gray-600">Orders placed on this device appear here automatically.</p></div>
+          <button id="my-orders-close" type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gray-100 hover:bg-gray-200" aria-label="Close my orders"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <div class="overflow-y-auto p-5 sm:p-6">
+          <form id="track-form" class="flex gap-2">
+          <label class="sr-only" for="tracking-code">Private order tracking code</label>
+          <input id="tracking-code" name="tracking_code" autocomplete="off" required class="min-w-0 flex-1 rounded-xl border border-orange-200 bg-white px-3 py-3 font-mono text-sm outline-none focus:border-brand" placeholder="Add tracking code">
+          <button class="shrink-0 rounded-xl bg-gray-900 px-4 py-3 text-sm font-extrabold text-white hover:bg-brand"><i class="fa-solid fa-plus mr-1"></i>Add order</button>
+        </form>
+          <div id="tracking-result" class="mt-4 space-y-3" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <section id="menu" class="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Something for every craving</p><h2 class="display mt-2 text-3xl font-extrabold sm:text-4xl">The good stuff</h2></div>
+        <p id="menu-status" class="text-sm text-gray-500">Fresh favorites, coming right up.</p>
+      </div>
+      <div id="categories" class="hide-scrollbar mt-7 flex gap-2 overflow-x-auto pb-2" aria-label="Filter menu by category"></div>
+      <div id="menu-grid" class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+      <div id="menu-empty" class="hidden rounded-3xl border border-dashed border-gray-200 py-16 text-center text-gray-500">No bites here yet. Check back soon!</div>
+    </section>
+  </main>
+
+  <footer class="border-t border-gray-100 bg-white">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-7 text-sm text-gray-500 sm:flex-row sm:px-6 lg:px-8">
+      <p>© <span id="year"></span> Highway Bites. Made fresh, served happy.</p><div class="flex gap-4"><a class="font-semibold text-gray-700 hover:text-brand" href="admin.html"><i class="fa-solid fa-lock mr-1.5"></i>Admin</a><a class="font-semibold text-gray-700 hover:text-brand" href="delivery.html"><i class="fa-solid fa-motorcycle mr-1.5"></i>Delivery staff</a></div>
+    </div>
+  </footer>
+
+  <div id="cart-backdrop" class="fixed inset-0 z-40 hidden bg-gray-950/40" aria-hidden="true"></div>
+  <aside id="cart-panel" class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md translate-x-full flex-col bg-white shadow-2xl transition-transform duration-300" aria-label="Shopping cart" aria-hidden="true">
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-5"><div><h2 class="text-xl font-extrabold">Your cart</h2><p id="cart-subtitle" class="mt-1 text-sm text-gray-500">A few good choices.</p></div><button id="cart-close" class="grid h-10 w-10 place-items-center rounded-full bg-gray-100 hover:bg-gray-200" aria-label="Close cart"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="cart-items" class="flex-1 overflow-y-auto px-5 py-4"></div>
+    <div class="border-t border-gray-100 px-5 py-5">
+      <div class="mb-4 flex justify-between text-sm text-gray-500"><span>Subtotal</span><span id="cart-total" class="font-extrabold text-gray-900">₹0</span></div>
+      <button id="checkout-open" class="w-full rounded-xl bg-brand px-4 py-3.5 font-extrabold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-gray-300" disabled>Continue to checkout <i class="fa-solid fa-arrow-right ml-2"></i></button>
+      <p class="mt-3 text-center text-xs text-gray-400">Taxes and any delivery fees are confirmed at checkout.</p>
+    </div>
+  </aside>
+
+  <div id="checkout-modal" class="fixed inset-0 z-[60] hidden items-center justify-center overflow-y-auto bg-gray-950/55 p-4">
+    <section class="my-auto w-full max-w-lg rounded-3xl bg-white shadow-2xl">
+      <div class="flex items-start justify-between border-b border-gray-100 px-6 py-5"><div><p class="text-xs font-extrabold uppercase tracking-widest text-brand">Almost there</p><h2 class="mt-1 text-2xl font-extrabold">Checkout</h2></div><button id="checkout-close" class="grid h-10 w-10 place-items-center rounded-full bg-gray-100" aria-label="Close checkout"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="checkout-form" class="space-y-4 p-6">
+        <label class="block text-sm font-bold">Your name<input required name="customer_name" maxlength="100" autocomplete="name" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="e.g. Alex Kumar"></label>
+        <label class="block text-sm font-bold">Phone number<input required name="phone" type="tel" maxlength="15" autocomplete="tel" pattern="[0-9]{7,15}" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="Digits only, including country code"></label>
+        <label class="block text-sm font-bold">Village, area &amp; nearby landmark<input name="address" required maxlength="500" autocomplete="street-address" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="Village / area, post office, school or other landmark"><span class="mt-1 block text-xs font-normal text-gray-500">If GPS is unavailable, this address and your phone number help us find you.</span></label>
+        <div class="rounded-xl bg-orange-50 p-3">
+          <p class="text-sm font-extrabold">Share GPS location <span class="font-medium text-gray-500">(optional)</span></p>
+          <p class="mt-1 text-xs leading-5 text-gray-600">GPS helps us find your delivery faster. If it does not work, continue with your village and landmark address above.</p>
+          <button id="location-button" type="button" class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand-dark"><i class="fa-solid fa-location-crosshairs"></i><span>Use my location</span></button><p id="location-status" role="status" aria-live="polite" class="mt-1 hidden text-xs text-gray-700"></p>
+        </div>
+        <fieldset id="payment-methods"><legend class="mb-2 text-sm font-bold">How would you like to pay?</legend><div class="grid grid-cols-2 gap-3">
+          <label id="cod-option" class="cursor-pointer"><input class="peer sr-only" type="radio" name="payment_method" value="cod" checked><span class="flex items-center gap-2 rounded-xl border border-gray-200 p-3 text-sm font-bold peer-checked:border-brand peer-checked:bg-orange-50"><i class="fa-solid fa-money-bill-wave text-brand"></i> Cash on delivery</span></label>
+          <label id="upi-option" class="cursor-pointer"><input class="peer sr-only" type="radio" name="payment_method" value="upi"><span class="flex items-center gap-2 rounded-xl border border-gray-200 p-3 text-sm font-bold peer-checked:border-brand peer-checked:bg-orange-50"><i class="fa-solid fa-qrcode text-brand"></i> UPI / QR</span></label>
+        </div></fieldset>
+        <div id="payment-qr" class="hidden rounded-2xl bg-orange-50 p-4 text-center"><p class="text-sm font-extrabold">Scan to pay</p><img id="qr-image" class="mx-auto mt-3 hidden h-40 w-40 rounded-xl bg-white object-contain p-2" alt="Store UPI payment QR code"><p id="upi-label" class="mt-2 text-sm text-gray-600"></p><p class="mt-2 text-xs text-gray-500">Place your order after completing payment. The team will confirm it.</p></div>
+        <div class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"><span class="text-sm font-semibold text-gray-600">Order total</span><strong id="checkout-total" class="text-lg">₹0</strong></div>
+        <p id="checkout-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"></p>
+        <button id="place-order" type="submit" class="w-full rounded-xl bg-gray-900 px-4 py-3.5 font-extrabold text-white transition hover:bg-brand disabled:cursor-wait disabled:opacity-60">Place my order <i class="fa-solid fa-arrow-right ml-2"></i></button>
+      </form>
+    </section>
   </div>
 
-  <div id="menu-modal" class="fixed inset-0 z-40 hidden items-center justify-center overflow-y-auto bg-gray-950/50 p-4">
-    <form id="menu-form" class="my-auto w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-      <div class="flex items-center justify-between"><div><p class="text-xs font-extrabold uppercase tracking-widest text-brand">Kitchen menu</p><h2 id="menu-modal-title" class="mt-1 text-xl font-extrabold">Add menu item</h2></div><button id="menu-modal-close" type="button" class="grid h-9 w-9 place-items-center rounded-full bg-gray-100" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
-      <input id="menu-id" type="hidden">
-      <div class="mt-5 grid gap-3 sm:grid-cols-2">
-        <label class="text-sm font-bold sm:col-span-2">Item name<input id="menu-name" required maxlength="120" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal"></label>
-        <label class="text-sm font-bold">Price (₹)<input id="menu-price" required type="number" min="0" step="0.01" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal"></label>
-        <label class="text-sm font-bold">Discount (%)<input id="menu-discount" required type="number" min="0" max="90" step="1" value="0" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal"></label>
-        <label class="text-sm font-bold">Category<input id="menu-category" required maxlength="60" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal" placeholder="Burgers"></label>
-        <label class="text-sm font-bold sm:col-span-2">Description<textarea id="menu-description" maxlength="500" rows="2" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal"></textarea></label>
-        <label class="text-sm font-bold sm:col-span-2">Upload food photo<input id="menu-image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal text-sm"></label>
-        <input id="menu-image-current" type="hidden">
-        <div id="menu-photo-preview-wrap" class="hidden sm:col-span-2"><img id="menu-photo-preview" class="h-36 w-full rounded-xl bg-gray-50 object-cover" alt="Selected menu item photo preview"></div>
-        <label class="flex items-center gap-2 text-sm font-semibold sm:col-span-2"><input id="menu-available" type="checkbox" checked class="h-4 w-4 accent-orange-500"> Available to order</label>
-      </div>
-      <p id="menu-form-error" class="mt-3 hidden text-sm text-red-600"></p>
-      <div class="mt-5 flex gap-3"><button type="button" id="menu-cancel" class="flex-1 rounded-xl border border-gray-200 px-4 py-3 font-bold">Cancel</button><button class="flex-1 rounded-xl bg-brand px-4 py-3 font-extrabold text-white hover:bg-brand-dark">Save item</button></div>
-    </form>
-  </div>
-  <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 hidden -translate-x-1/2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
+  <div id="toast" class="toast fixed bottom-5 left-1/2 z-[80] hidden -translate-x-1/2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
   <script>
     (() => {
       const { supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.HIGHWAY_BITES_CONFIG;
       const databaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('PASTE_'));
       const db = databaseConfigured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+      const fallbackItems = [
+        { id: 'demo-1', name: 'Highway Smash Burger', description: 'Double smash patty, cheddar, pickles and our signature sauce.', price: 249, category: 'Burgers', image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-2', name: 'Crispy Chicken Burger', description: 'Crunchy chicken, fresh lettuce and a creamy pepper mayo.', price: 219, category: 'Burgers', image_url: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-3', name: 'Loaded Roadside Fries', description: 'Golden fries piled high with cheese, herbs and a little kick.', price: 149, category: 'Sides', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-4', name: 'Smoky BBQ Pizza', description: 'Smoky barbecue, mozzarella and colorful garden veggies.', price: 329, category: 'Pizza', image_url: 'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=700&q=80' }
+      ];
+      let menuItems = [];
+      let cart = new Map();
+      let selectedCategory = 'All';
+      let storeSettings = { upi_id: '', qr_image_url: '', cod_enabled: true, upi_enabled: true };
+      let coordinates = null;
+      let trackingTimer = null;
+      const trackedCodes = new Set();
+      const trackedOrders = new Map();
       const $ = (selector) => document.querySelector(selector);
       const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
       const money = (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(amount) || 0);
+      $('#year').textContent = new Date().getFullYear();
+
       function describeDatabaseError(error) {
         if (!databaseConfigured) {
-          return 'Add this project’s anon/publishable key to supabase-config.js to enable database access.';
+          return 'Add this project’s anon/publishable key to supabase-config.js to enable live orders.';
+        }
+        if (/customer delivery location|refresh your gps location|gps accuracy must/i.test(String(error?.message || error))) {
+          return 'GPS is optional. Your Supabase database still has the old GPS-required order function. Run gps-optional-migration.sql once in Supabase SQL Editor; then you can order using your village/area address without GPS.';
         }
         if (/failed to fetch/i.test(String(error?.message || error))) {
           return `Cannot connect to Supabase at ${SUPABASE_URL}. Check that the project URL is correct, the project is active, and your internet connection is working.`;
         }
-        return error?.message || 'An unexpected database error occurred.';
+        return error?.message || 'An unexpected database error occurred. Please try again.';
       }
-      let orders = [];
-      let menuItems = [];
-      let deliveryUsers = [];
-      let realtimeChannel = null;
-      let soundContext = null;
-      let authenticated = false;
 
-      function toast(message) {
-        const node = $('#toast');
-        node.textContent = message;
-        node.classList.remove('hidden');
-        clearTimeout(toast.timeout);
-        toast.timeout = setTimeout(() => node.classList.add('hidden'), 3000);
+      function notify(message) {
+        const toast = $('#toast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        clearTimeout(notify.timeout);
+        notify.timeout = setTimeout(() => toast.classList.add('hidden'), 2800);
       }
-      function setAuthenticated(value) {
-        authenticated = value;
-        $('#login-screen').classList.toggle('hidden', value);
-        $('#admin-app').classList.toggle('hidden', !value);
-        if (value) initialize();
-        else if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+
+      function renderTracking(order, code) {
+        const statusLabels = {
+          received: 'Order received',
+          confirmed: 'Order confirmed',
+          preparing: 'Being prepared',
+          ready: 'Ready',
+          out_for_delivery: 'Out for delivery',
+          delivered: 'Delivered',
+          completed: 'Completed',
+          cancelled: 'Cancelled'
+        };
+        const steps = ['received', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
+        const currentIndex = steps.indexOf(order.status === 'completed' ? 'delivered' : order.status);
+        const cancelled = order.status === 'cancelled';
+        return `<article class="rounded-2xl border border-orange-100 bg-white p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div><p class="text-xs font-bold uppercase tracking-wider text-gray-500">Order ${esc(String(order.order_id).slice(0, 8).toUpperCase())}</p><h3 class="mt-1 text-lg font-extrabold ${cancelled ? 'text-red-600' : 'text-brand'}">${esc(statusLabels[order.status] || order.status)}</h3></div>
+            <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-gray-700">${money(order.total)} · ${order.payment_method === 'upi' ? 'UPI' : 'Cash on delivery'}</span>
+          </div>
+          ${cancelled ? '<p class="mt-3 text-sm text-red-700">Please contact Highway Bites if you need help with this cancelled order.</p>' : `<ol class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">${steps.map((step, index) => `<li class="rounded-lg px-3 py-2 text-xs font-bold ${index <= currentIndex ? 'bg-orange-100 text-orange-900' : 'bg-gray-50 text-gray-400'}"><i class="fa-solid ${index <= currentIndex ? 'fa-circle-check' : 'fa-circle'} mr-1.5"></i>${statusLabels[step]}</li>`).join('')}</ol>`}
+          <div class="mt-4 border-t border-gray-100 pt-3">${(Array.isArray(order.items) ? order.items : []).map((item) => `<p class="flex justify-between gap-3 py-1 text-sm"><span>${esc(item.quantity)} × ${esc(item.name)}</span><span>${money(Number(item.price) * Number(item.quantity))}</span></p>`).join('')}</div>
+          <p class="mt-2 text-xs text-gray-500">Last updated ${new Date(order.updated_at || order.created_at).toLocaleString()}. Status refreshes automatically.</p>
+          <div class="mt-2 flex flex-wrap items-center justify-between gap-2"><p class="break-all text-xs text-gray-500">Private code: <span class="font-mono">${esc(code)}</span></p><button type="button" data-remove-order="${esc(code)}" class="text-xs font-bold text-gray-500 hover:text-red-600">Remove from this device</button></div>
+        </article>`;
       }
-      async function authorizeAdmin(user) {
-        if (!db || !user) {
-          setAuthenticated(false);
-          return false;
+
+      function savedTrackingCodes() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('highwayBitesTrackingCodes') || '[]');
+          const codes = Array.isArray(saved) ? saved.filter((code) => typeof code === 'string') : [];
+          const previousCode = localStorage.getItem('highwayBitesTrackingCode');
+          if (previousCode && !codes.includes(previousCode)) codes.push(previousCode);
+          return [...new Set(codes)];
+        } catch (error) {
+          console.warn('Saved order list could not be read:', error);
+          return [];
         }
-        const { data, error } = await db.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
-        if (error) throw error;
-        if (!data) {
-          await db.auth.signOut();
-          throw new Error('This account has not been approved for admin access.');
-        }
-        $('#admin-email').value = user.email || '';
-        setAuthenticated(true);
-        return true;
       }
-      $('#login-form').addEventListener('submit', async (event) => {
+
+      function persistTrackingCodes() {
+        try {
+          localStorage.setItem('highwayBitesTrackingCodes', JSON.stringify([...trackedCodes]));
+          localStorage.removeItem('highwayBitesTrackingCode');
+        } catch (error) {
+          console.warn('Order history could not be saved on this device:', error);
+        }
+      }
+
+      function renderMyOrders() {
+        const result = $('#tracking-result');
+        result.innerHTML = trackedCodes.size ? [...trackedCodes].map((code) => {
+          const entry = trackedOrders.get(code);
+          if (entry?.order) return renderTracking(entry.order, code);
+          if (entry?.error) return `<article class="rounded-2xl border border-amber-200 bg-white p-4 text-sm text-amber-800">${esc(entry.error)} <button type="button" data-remove-order="${esc(code)}" class="ml-2 font-bold underline">Remove</button></article>`;
+          return `<article class="rounded-2xl border border-orange-100 bg-white p-4 text-sm text-gray-600"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading order ${esc(code.slice(0, 8))}…</article>`;
+        }).join('') : '<div class="rounded-2xl border border-dashed border-orange-200 bg-white p-6 text-center text-sm text-gray-500">No saved orders yet. Place an order, and it will show up here.</div>';
+      }
+
+      async function refreshMyOrders() {
+        if (!db || !trackedCodes.size) return;
+        await Promise.all([...trackedCodes].map(async (code) => {
+          const previous = trackedOrders.get(code);
+          if (previous?.order && ['delivered', 'completed', 'cancelled'].includes(previous.order.status)) return;
+          const { data, error } = await db.rpc('track_order', { p_tracking_code: code });
+          if (error) {
+            console.error('Order tracking lookup failed:', error.message);
+            trackedOrders.set(code, { error: `Could not load order ${code.slice(0, 8)}: ${error.message}` });
+            return;
+          }
+          const order = Array.isArray(data) ? data[0] : data;
+          trackedOrders.set(code, order ? { order } : { error: `No order matches code ${code.slice(0, 8)}. Check it or remove it.` });
+        }));
+        renderMyOrders();
+      }
+
+      function beginTracking(code) {
+        const cleanCode = code.trim().toLowerCase();
+        trackedCodes.add(cleanCode);
+        trackedOrders.delete(cleanCode);
+        persistTrackingCodes();
+        renderMyOrders();
+        refreshMyOrders();
+        if (!trackingTimer) trackingTimer = setInterval(refreshMyOrders, 10000);
+        setMyOrdersOpen(true);
+      }
+
+      $('#track-form').addEventListener('submit', (event) => {
         event.preventDefault();
-        const errorBox = $('#login-error');
-        errorBox.classList.add('hidden');
-        const button = event.currentTarget.querySelector('button[type="submit"], button:not([type])');
-        button.disabled = true;
-        try {
-          if (!db) throw new Error(describeDatabaseError(new Error('Supabase is not configured.')));
-          const { data, error } = await db.auth.signInWithPassword({
-            email: $('#admin-email').value.trim(),
-            password: $('#admin-password').value
-          });
-          if (error) throw error;
-          await authorizeAdmin(data.user);
-        } catch (error) {
-          console.error('Admin sign-in failed:', error);
-          errorBox.textContent = error.message || 'Sign-in failed. Please try again.';
-          errorBox.classList.remove('hidden');
-        } finally {
-          button.disabled = false;
-        }
-      });
-      $('#logout').addEventListener('click', async () => {
-        if (db) {
-          const { error } = await db.auth.signOut();
-          if (error) { console.error('Admin sign-out failed:', error.message); toast(`Sign out failed: ${error.message}`); return; }
-        }
-        setAuthenticated(false);
-      });
-
-      function playAlert() {
-        try {
-          soundContext = soundContext || new (window.AudioContext || window.webkitAudioContext)();
-          if (soundContext.state === 'suspended') soundContext.resume();
-          [0, 0.19].forEach((delay) => {
-            const oscillator = soundContext.createOscillator();
-            const gain = soundContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.value = 880;
-            gain.gain.setValueAtTime(0.0001, soundContext.currentTime + delay);
-            gain.gain.exponentialRampToValueAtTime(0.16, soundContext.currentTime + delay + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, soundContext.currentTime + delay + 0.14);
-            oscillator.connect(gain);
-            gain.connect(soundContext.destination);
-            oscillator.start(soundContext.currentTime + delay);
-            oscillator.stop(soundContext.currentTime + delay + 0.15);
-          });
-        } catch (error) { console.warn('Order alert sound unavailable:', error); }
-      }
-      function dayStart() {
-        const now = new Date();
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-      }
-      function renderOrders() {
-        const filter = $('#order-filter').value;
-        const visibleOrders = orders.filter((order) => filter === 'all' || (filter === 'completed' ? ['delivered', 'completed', 'cancelled'].includes(order.status) : !['delivered', 'completed', 'cancelled'].includes(order.status)));
-        $('#orders-empty').classList.toggle('hidden', visibleOrders.length > 0);
-        $('#orders-list').innerHTML = visibleOrders.map((order) => {
-          const items = Array.isArray(order.items) ? order.items : [];
-          const statusLabels = { received: 'Order received', confirmed: 'Confirmed', preparing: 'Preparing', ready: 'Ready', out_for_delivery: 'Out for delivery', delivered: 'Delivered', completed: 'Completed', cancelled: 'Cancelled' };
-          const options = Object.entries(statusLabels).map(([status, label]) => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${label}</option>`).join('');
-          const deliveryOptions = `<option value="">Not assigned</option>${deliveryUsers.filter((driver) => driver.is_active || order.assigned_delivery_user === driver.user_id).map((driver) => `<option value="${esc(driver.user_id)}" ${order.assigned_delivery_user === driver.user_id ? 'selected' : ''}>${esc(driver.name)}${driver.is_active ? '' : ' (paused)'}</option>`).join('')}`;
-          const location = order.latitude != null && order.longitude != null ? `<a class="font-semibold text-brand hover:underline" href="https://maps.google.com/?q=${encodeURIComponent(`${order.latitude},${order.longitude}`)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-dot mr-1"></i>Open customer GPS location</a><span class="ml-2 text-xs text-gray-500">${order.location_accuracy_meters != null ? `Reported GPS accuracy ±${Math.round(order.location_accuracy_meters)} m` : 'GPS accuracy not recorded'}${order.location_captured_at ? ` · captured ${new Date(order.location_captured_at).toLocaleTimeString()}` : ''}</span>` : '';
-          return `<article class="p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><div class="flex flex-wrap items-center gap-2"><h3 class="font-extrabold">${esc(order.customer_name)}</h3><span class="rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-gray-600">#${esc(String(order.id).slice(0, 8))}</span></div><p class="mt-1 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</p></div><select data-status="${esc(order.id)}" aria-label="Update order status" class="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs font-bold">${options}</select></div>
-            <div class="mt-4 rounded-xl bg-gray-50 p-3">${items.map((item) => `<div class="flex justify-between gap-3 py-1 text-sm"><span>${esc(item.quantity)} × ${esc(item.name)}</span><span class="font-semibold">${money(Number(item.price) * Number(item.quantity))}</span></div>`).join('')}</div>
-            <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm"><div><span class="font-extrabold">${money(order.total)}</span><span class="ml-2 text-xs text-gray-500">${order.payment_method === 'upi' ? 'UPI' : 'Cash on delivery'} · ${esc(order.payment_status)}</span></div><a href="tel:${esc(order.phone)}" class="font-semibold text-gray-600 hover:text-brand"><i class="fa-solid fa-phone mr-1"></i>${esc(order.phone)}</a></div>
-            ${order.address ? `<p class="mt-2 text-sm text-gray-500"><i class="fa-solid fa-house mr-1 text-gray-400"></i>${esc(order.address)}</p>` : ''}
-            ${location ? `<p class="mt-2 text-sm">${location}</p>` : '<p class="mt-2 text-xs text-amber-700">No GPS fix was shared. Use the customer village/landmark address and phone.</p>'}
-            <label class="mt-3 block text-xs font-bold text-gray-600">Delivery person<select data-assignment="${esc(order.id)}" aria-label="Assign delivery person" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold">${deliveryOptions}</select></label>
-          </article>`;
-        }).join('');
-        const active = orders.filter((order) => !['delivered', 'completed', 'cancelled'].includes(order.status));
-        const todayOrders = orders.filter((order) => new Date(order.created_at) >= new Date(dayStart()));
-        $('#active-count').textContent = active.length;
-        $('#today-count').textContent = todayOrders.length;
-        $('#today-sales').textContent = money(todayOrders.reduce((sum, order) => sum + Number(order.total), 0));
-      }
-      async function loadOrders() {
-        try {
-          if (!db) throw new Error('Supabase has not been configured.');
-          const { data, error } = await db.from('orders').select('*').order('created_at', { ascending: false }).limit(100);
-          if (error) throw error;
-          orders = data || [];
-          renderOrders();
-        } catch (error) {
-          console.error('Unable to load orders:', error);
-          toast(`Orders could not be loaded: ${describeDatabaseError(error)}`);
-        }
-      }
-      async function loadDeliveryTeam() {
-        const { data, error } = await db.from('delivery_users').select('user_id,name,phone,is_active').order('name');
-        if (error) throw error;
-        deliveryUsers = data || [];
-        $('#delivery-team-list').innerHTML = deliveryUsers.length ? deliveryUsers.map((driver) => `<div class="flex items-center justify-between gap-2 py-2"><div class="min-w-0"><p class="truncate text-sm font-bold">${esc(driver.name)} <span class="text-xs font-normal ${driver.is_active ? 'text-green-600' : 'text-gray-400'}">${driver.is_active ? 'Active' : 'Paused'}</span></p><p class="truncate text-xs text-gray-500">${esc(driver.phone || driver.user_id)}</p></div><button type="button" data-toggle-driver="${esc(driver.user_id)}" data-active="${driver.is_active}" class="shrink-0 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-bold hover:border-brand">${driver.is_active ? 'Pause' : 'Activate'}</button></div>`).join('') : '<p class="py-3 text-xs text-gray-500">No drivers added yet.</p>';
-        renderOrders();
-      }
-      $('#delivery-team-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const button = form.querySelector('button');
-        button.disabled = true;
-        try {
-          const userId = $('#delivery-user-id').value.trim();
-          if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) throw new Error('Enter the valid UUID shown for the driver in Supabase Authentication.');
-          const { error } = await db.from('delivery_users').upsert({ user_id: userId, name: $('#delivery-user-name').value.trim(), phone: $('#delivery-user-phone').value.trim(), is_active: true });
-          if (error) throw error;
-          form.reset();
-          await loadDeliveryTeam();
-          toast('Delivery driver saved');
-        } catch (error) {
-          console.error('Delivery driver could not be saved:', error);
-          toast(`Driver could not be saved: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
-      $('#delivery-team-list').addEventListener('click', async (event) => {
-        const button = event.target.closest('[data-toggle-driver]');
-        if (!button) return;
-        const driver = deliveryUsers.find((entry) => entry.user_id === button.dataset.toggleDriver);
-        if (!driver) return;
-        const { error } = await db.from('delivery_users').update({ is_active: !driver.is_active }).eq('user_id', driver.user_id);
-        if (error) { console.error('Could not update delivery access:', error); toast(`Driver update failed: ${error.message}`); return; }
-        await loadDeliveryTeam();
-        toast(driver.is_active ? 'Driver access paused' : 'Driver access activated');
-      });
-      async function saveOrder(orderId, status, deliveryUserId) {
-        const { error } = await db.rpc('admin_update_order', {
-          p_order_id: orderId,
-          p_status: status,
-          p_delivery_user: deliveryUserId || null
-        });
-        if (error) throw error;
-        const order = orders.find((entry) => entry.id === orderId);
-        if (order) {
-          order.status = status;
-          order.assigned_delivery_user = deliveryUserId || null;
-        }
-        renderOrders();
-        toast('Order updated');
-      }
-      $('#orders-list').addEventListener('change', async (event) => {
-        const select = event.target.closest('[data-status]');
-        const assignment = event.target.closest('[data-assignment]');
-        if (!select && !assignment) return;
-        const orderId = (select || assignment).dataset.status || assignment.dataset.assignment;
-        const order = orders.find((entry) => entry.id === orderId);
-        if (!order) return;
-        try {
-          await saveOrder(orderId, select ? select.value : order.status, assignment ? assignment.value : order.assigned_delivery_user);
-        } catch (error) {
-          console.error('Order update failed:', error);
-          toast(`Order update failed: ${error.message}`);
-          await loadOrders();
-        }
-      });
-      $('#order-filter').addEventListener('change', renderOrders);
-      $('#refresh-orders').addEventListener('click', loadOrders);
-
-      async function loadMenu() {
-        try {
-          if (!db) throw new Error('Supabase has not been configured.');
-          const { data, error } = await db.from('menu_items').select('*').order('created_at', { ascending: false });
-          if (error) throw error;
-          menuItems = data || [];
-          renderMenuItems();
-        } catch (error) {
-          console.error('Unable to load menu items:', error);
-          toast(`Menu could not be loaded: ${describeDatabaseError(error)}`);
-        }
-      }
-      function renderMenuItems() {
-        $('#menu-admin-list').innerHTML = menuItems.length ? menuItems.map((item) => `<div class="flex items-center gap-3 py-3"><img class="h-12 w-12 rounded-lg bg-gray-100 object-cover" src="${esc(item.image_url || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=100&q=70')}" alt="" onerror="this.style.display='none'"><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">${esc(item.name)}</p><p class="text-xs text-gray-500">${money(Number(item.price) * (100 - Number(item.discount_percent || 0)) / 100)}${Number(item.discount_percent) ? ` <del>${money(item.price)}</del> · ${esc(item.discount_percent)}% OFF` : ''} · ${esc(item.category)} · <span class="${item.is_available ? 'text-green-600' : 'text-gray-400'}">${item.is_available ? 'Available' : 'Paused'}</span></p></div><button data-edit="${esc(item.id)}" class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-brand" aria-label="Edit ${esc(item.name)}"><i class="fa-solid fa-pen"></i></button><button data-delete-menu="${esc(item.id)}" class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600" aria-label="Remove ${esc(item.name)}" title="Remove item"><i class="fa-solid fa-trash"></i></button></div>`).join('') : '<p class="py-8 text-center text-sm text-gray-500">No menu items yet. Add the first one.</p>';
-      }
-      function openMenuModal(item) {
-        $('#menu-form').reset();
-        $('#menu-form-error').classList.add('hidden');
-        $('#menu-id').value = item?.id || '';
-        $('#menu-modal-title').textContent = item ? 'Edit menu item' : 'Add menu item';
-        $('#menu-name').value = item?.name || '';
-        $('#menu-price').value = item?.price ?? '';
-        $('#menu-discount').value = item?.discount_percent ?? 0;
-        $('#menu-category').value = item?.category || '';
-        $('#menu-description').value = item?.description || '';
-        $('#menu-image-current').value = item?.image_url || '';
-        $('#menu-image-file').required = !item?.image_url;
-        $('#menu-photo-preview-wrap').classList.toggle('hidden', !item?.image_url);
-        $('#menu-photo-preview').src = item?.image_url || '';
-        $('#menu-available').checked = item?.is_available ?? true;
-        $('#menu-modal').classList.remove('hidden');
-        $('#menu-modal').classList.add('flex');
-      }
-      function closeMenuModal() { $('#menu-modal').classList.add('hidden'); $('#menu-modal').classList.remove('flex'); }
-      $('#add-menu').addEventListener('click', () => openMenuModal(null));
-      $('#menu-admin-list').addEventListener('click', (event) => {
-        const deleteButton = event.target.closest('[data-delete-menu]');
-        if (deleteButton) {
-          removeMenuItem(deleteButton.dataset.deleteMenu, deleteButton);
+        const code = $('#tracking-code').value.trim();
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(code)) {
+          notify('Enter the full private tracking code shown after placing your order.');
           return;
         }
-        const button = event.target.closest('[data-edit]');
-        if (button) openMenuModal(menuItems.find((item) => String(item.id) === button.dataset.edit));
+        beginTracking(code);
+        $('#tracking-code').value = '';
       });
-      async function removeMenuItem(id, button) {
-        const item = menuItems.find((entry) => String(entry.id) === id);
-        if (!item) return;
-        if (!window.confirm(`Permanently remove "${item.name}" from the menu? Past orders will keep their item details.`)) return;
-        button.disabled = true;
+      $('#tracking-result').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-remove-order]');
+        if (!button) return;
+        const code = button.dataset.removeOrder;
+        trackedCodes.delete(code);
+        trackedOrders.delete(code);
+        persistTrackingCodes();
+        if (!trackedCodes.size && trackingTimer) {
+          clearInterval(trackingTimer);
+          trackingTimer = null;
+        }
+        renderMyOrders();
+      });
+
+      function itemPrice(item) {
+        return Math.round(Number(item.price) * (100 - Number(item.discount_percent || 0))) / 100;
+      }
+
+      function renderMenu() {
+        const categories = ['All', ...new Set(menuItems.map((item) => item.category).filter(Boolean))];
+        if (!categories.includes(selectedCategory)) selectedCategory = 'All';
+        $('#categories').innerHTML = categories.map((category) => `<button data-category="${esc(category)}" class="shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition ${category === selectedCategory ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:ring-brand hover:text-brand'}">${esc(category)}</button>`).join('');
+        const visible = menuItems.filter((item) => selectedCategory === 'All' || item.category === selectedCategory);
+        $('#menu-empty').classList.toggle('hidden', visible.length > 0);
+        $('#menu-grid').innerHTML = visible.map((item) => `<article class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-card transition hover:-translate-y-1">
+          <div class="relative overflow-hidden bg-orange-50"><img class="h-48 w-full object-cover transition duration-500 group-hover:scale-105" src="${esc(item.image_url || fallbackItems[0].image_url)}" alt="${esc(item.name)}" loading="lazy" onerror="this.src='${fallbackItems[0].image_url}'"><span class="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-gray-700">${esc(item.category)}</span>${Number(item.discount_percent) > 0 ? `<span class="absolute right-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-extrabold text-white">${esc(item.discount_percent)}% OFF</span>` : ''}</div>
+          <div class="p-4"><h3 class="text-lg font-extrabold">${esc(item.name)}</h3><p class="mt-1.5 min-h-10 text-sm leading-5 text-gray-500">${esc(item.description || 'A Highway Bites favorite, made fresh just for you.')}</p><div class="mt-4 flex items-center justify-between"><span class="flex items-baseline gap-2"><strong class="text-lg font-extrabold">${money(itemPrice(item))}</strong>${Number(item.discount_percent) > 0 ? `<del class="text-sm text-gray-400">${money(item.price)}</del>` : ''}</span><button data-add="${esc(item.id)}" class="grid h-10 w-10 place-items-center rounded-xl bg-orange-50 text-brand transition hover:bg-brand hover:text-white" aria-label="Add ${esc(item.name)} to cart"><i class="fa-solid fa-plus"></i></button></div></div>
+        </article>`).join('');
+      }
+
+      async function loadMenu() {
+        $('#menu-status').textContent = 'Loading the good stuff...';
         try {
-          const { error } = await db.from('menu_items').delete().eq('id', id);
+          if (!db) throw new Error('Supabase has not been configured.');
+          const { data, error } = await db.from('menu_items').select('id,name,description,price,discount_percent,category,image_url,is_available').eq('is_available', true).order('created_at');
           if (error) throw error;
-          menuItems = menuItems.filter((entry) => String(entry.id) !== id);
-          renderMenuItems();
-          toast(`${item.name} removed from the menu`);
+          menuItems = data || [];
+          $('#menu-status').textContent = menuItems.length ? 'Fresh favorites, coming right up.' : 'Our kitchen is updating the menu. Check back soon!';
         } catch (error) {
-          console.error('Menu item could not be removed:', error);
-          toast(`Could not remove ${item.name}: ${describeDatabaseError(error)}`);
-          button.disabled = false;
+          console.error('Unable to load menu:', error);
+          menuItems = fallbackItems;
+          $('#menu-status').textContent = `Showing our favorites. ${describeDatabaseError(error)}`;
+        }
+        renderMenu();
+      }
+
+      function cartTotal() {
+        return [...cart.values()].reduce((sum, line) => sum + itemPrice(line.item) * line.quantity, 0);
+      }
+      function renderCart() {
+        const count = [...cart.values()].reduce((sum, line) => sum + line.quantity, 0);
+        $('#cart-count').textContent = count;
+        $('#cart-subtitle').textContent = count ? `${count} tasty ${count === 1 ? 'item' : 'items'}` : 'A few good choices.';
+        $('#cart-total').textContent = money(cartTotal());
+        $('#checkout-total').textContent = money(cartTotal());
+        $('#checkout-open').disabled = count === 0;
+        const lines = [...cart.values()];
+        $('#cart-items').innerHTML = lines.length ? lines.map(({ item, quantity }) => `<div class="flex gap-3 border-b border-gray-100 py-4"><img class="h-16 w-16 rounded-xl object-cover" src="${esc(item.image_url || fallbackItems[0].image_url)}" alt=""><div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><h3 class="truncate font-bold">${esc(item.name)}</h3><span class="whitespace-nowrap text-sm font-extrabold">${money(itemPrice(item) * quantity)}</span></div><p class="mt-1 text-sm text-gray-500">${money(itemPrice(item))} each${Number(item.discount_percent) > 0 ? ` · ${esc(item.discount_percent)}% off` : ''}</p><div class="mt-2 inline-flex items-center gap-3 rounded-lg bg-gray-100 px-2 py-1"><button data-change="${esc(item.id)}" data-delta="-1" aria-label="Remove one ${esc(item.name)}">−</button><span class="text-sm font-bold">${quantity}</span><button data-change="${esc(item.id)}" data-delta="1" aria-label="Add one ${esc(item.name)}">+</button></div></div></div>`).join('') : '<div class="grid h-full place-items-center text-center"><div><span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-orange-50 text-2xl text-brand"><i class="fa-solid fa-basket-shopping"></i></span><p class="mt-4 font-bold">Your cart is taking a pit stop</p><p class="mt-1 text-sm text-gray-500">Add something delicious from our menu.</p></div></div>';
+      }
+      function setCartOpen(isOpen) {
+        $('#cart-panel').classList.toggle('translate-x-full', !isOpen);
+        $('#cart-panel').setAttribute('aria-hidden', String(!isOpen));
+        $('#cart-backdrop').classList.toggle('hidden', !isOpen);
+        document.body.classList.toggle('overflow-hidden', isOpen);
+      }
+
+      $('#categories').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-category]');
+        if (button) { selectedCategory = button.dataset.category; renderMenu(); }
+      });
+      $('#menu-grid').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-add]');
+        if (!button) return;
+        const item = menuItems.find((entry) => String(entry.id) === button.dataset.add);
+        if (!item) return;
+        const existing = cart.get(String(item.id));
+        cart.set(String(item.id), { item, quantity: (existing?.quantity || 0) + 1 });
+        renderCart();
+        notify(`${item.name} added to your cart`);
+      });
+      $('#cart-items').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-change]');
+        if (!button) return;
+        const id = button.dataset.change;
+        const line = cart.get(id);
+        if (!line) return;
+        line.quantity += Number(button.dataset.delta);
+        if (line.quantity < 1) cart.delete(id);
+        else cart.set(id, line);
+        renderCart();
+      });
+      $('#cart-open').addEventListener('click', () => setCartOpen(true));
+      $('#cart-close').addEventListener('click', () => setCartOpen(false));
+      $('#cart-backdrop').addEventListener('click', () => setCartOpen(false));
+      function setMyOrdersOpen(isOpen) {
+        $('#my-orders-modal').classList.toggle('hidden', !isOpen);
+        $('#my-orders-modal').classList.toggle('flex', isOpen);
+        document.body.classList.toggle('overflow-hidden', isOpen);
+        if (isOpen) {
+          renderMyOrders();
+          refreshMyOrders();
+          $('#my-orders-close').focus();
         }
       }
-      $('#menu-modal-close').addEventListener('click', closeMenuModal);
-      $('#menu-cancel').addEventListener('click', closeMenuModal);
-      $('#menu-modal').addEventListener('click', (event) => { if (event.target === $('#menu-modal')) closeMenuModal(); });
-      function previewImage(file, image, wrapper) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-          image.src = String(reader.result);
-          wrapper.classList.remove('hidden');
-        });
-        reader.readAsDataURL(file);
-      }
-      $('#menu-image-file').addEventListener('change', (event) => {
-        previewImage(event.currentTarget.files[0], $('#menu-photo-preview'), $('#menu-photo-preview-wrap'));
+      ['#my-orders-open', '#my-orders-open-mobile', '#my-orders-open-banner'].forEach((selector) => {
+        $(selector).addEventListener('click', () => setMyOrdersOpen(true));
       });
-      $('#setting-qr-file').addEventListener('change', (event) => {
-        previewImage(event.currentTarget.files[0], $('#qr-preview'), $('#qr-preview-wrap'));
+      $('#my-orders-close').addEventListener('click', () => setMyOrdersOpen(false));
+      $('#my-orders-modal').addEventListener('click', (event) => {
+        if (event.target === $('#my-orders-modal')) setMyOrdersOpen(false);
       });
-      async function uploadImage(file, folder) {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!allowedTypes.includes(file.type)) throw new Error('Choose a JPG, PNG, WebP, or GIF image.');
-        if (file.size > 5 * 1024 * 1024) throw new Error('Image size must be 5 MB or less.');
-        const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' })[file.type];
-        const path = `${folder}/${crypto.randomUUID()}.${extension}`;
-        const { error } = await db.storage.from('menu-photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
-        if (error) throw error;
-        return db.storage.from('menu-photos').getPublicUrl(path).data.publicUrl;
+      $('#checkout-open').addEventListener('click', () => {
+        setCartOpen(false);
+        $('#checkout-modal').classList.remove('hidden');
+        $('#checkout-modal').classList.add('flex');
+      });
+      function closeCheckout() {
+        $('#checkout-modal').classList.add('hidden');
+        $('#checkout-modal').classList.remove('flex');
       }
-      $('#menu-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const id = $('#menu-id').value;
-        const errorBox = $('#menu-form-error');
-        const saveButton = $('#menu-form').querySelector('button[type="submit"], button:not([type])');
-        saveButton.disabled = true;
-        errorBox.classList.add('hidden');
-        try {
-          const imageFile = $('#menu-image-file').files[0];
-          const imageUrl = imageFile ? await uploadImage(imageFile, 'menu') : $('#menu-image-current').value;
-          if (!imageUrl) throw new Error('Upload a photo for this menu item.');
-          const item = {
-            name: $('#menu-name').value.trim(),
-            price: Number($('#menu-price').value),
-            discount_percent: Number($('#menu-discount').value),
-            category: $('#menu-category').value.trim(),
-            description: $('#menu-description').value.trim(),
-            image_url: imageUrl,
-            is_available: $('#menu-available').checked
+      $('#checkout-close').addEventListener('click', closeCheckout);
+      $('#checkout-modal').addEventListener('click', (event) => { if (event.target === $('#checkout-modal')) closeCheckout(); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeCheckout(); setCartOpen(false); setMyOrdersOpen(false); } });
+      document.querySelectorAll('[name="payment_method"]').forEach((input) => input.addEventListener('change', () => {
+        const isUpi = $('input[name="payment_method"]:checked').value === 'upi';
+        $('#payment-qr').classList.toggle('hidden', !isUpi);
+        $('#qr-image').classList.toggle('hidden', !isUpi || !storeSettings.qr_image_url);
+        $('#qr-image').src = storeSettings.qr_image_url || '';
+        $('#upi-label').textContent = storeSettings.upi_id ? `UPI ID: ${storeSettings.upi_id}` : 'UPI payment details are not available yet. Please choose cash on delivery.';
+        $('#place-order').disabled = isUpi && (!storeSettings.upi_enabled || (!storeSettings.upi_id && !storeSettings.qr_image_url));
+      }));
+      function captureCustomerLocation() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('GPS is not available in this browser. You can still order using your village and landmark address.'));
+            return;
+          }
+          let bestPosition = null;
+          let watchId = null;
+          let settled = false;
+          const finish = (position, error) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+            if (position) resolve(position);
+            else reject(error);
           };
-          const query = id ? db.from('menu_items').update(item).eq('id', id) : db.from('menu_items').insert(item);
-          const { error } = await query;
-          if (error) throw error;
-          closeMenuModal();
-          await loadMenu();
-          toast(id ? 'Menu item updated' : 'Menu item added');
+          const timer = setTimeout(() => {
+            if (bestPosition) finish(bestPosition);
+            else finish(null, new Error('GPS took too long. You can still place the order using your village and landmark address.'));
+          }, 18000);
+          const locationError = (error) => {
+            const messages = {
+              1: 'Location permission was denied. You can still order using your village and landmark address.',
+              2: 'GPS could not find your location. You can still order using your village and landmark address.',
+              3: 'GPS took too long. You can still place the order using your address.'
+            };
+            finish(bestPosition, new Error(messages[error.code] || 'GPS location is unavailable. Continue using your address.'));
+          };
+          watchId = navigator.geolocation.watchPosition((position) => {
+            if (!bestPosition || position.coords.accuracy < bestPosition.coords.accuracy) bestPosition = position;
+            if (position.coords.accuracy <= 50) finish(position);
+          }, locationError, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+        });
+      }
+
+      async function updateCustomerLocation() {
+        const status = $('#location-status');
+        status.classList.remove('hidden');
+        coordinates = null;
+        const button = $('#location-button');
+        button.disabled = true;
+        button.classList.add('cursor-wait', 'opacity-60');
+        button.querySelector('span').textContent = 'Finding location...';
+        status.textContent = 'Finding the best available GPS fix (up to 18 seconds). You can still order using your address.';
+        try {
+          const position = await captureCustomerLocation();
+          coordinates = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy_meters: position.coords.accuracy,
+            captured_at: new Date(position.timestamp).toISOString()
+          };
+          status.textContent = `Location added (about ${Math.round(coordinates.accuracy_meters)} m accuracy).`;
         } catch (error) {
-          console.error('Menu item could not be saved:', error);
-          errorBox.textContent = `Could not save item: ${error.message}`;
-          $('#menu-form-error').classList.remove('hidden');
+          console.info('Optional customer GPS location was not captured:', error.message);
+          status.textContent = error.message;
         } finally {
-          saveButton.disabled = false;
+          button.disabled = false;
+          button.classList.remove('cursor-wait', 'opacity-60');
+          button.querySelector('span').textContent = 'Try GPS again (optional)';
+        }
+      }
+
+      $('#location-button').addEventListener('click', updateCustomerLocation);
+      $('#checkout-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const checkoutForm = event.currentTarget;
+        const errorBox = $('#checkout-error');
+        errorBox.classList.add('hidden');
+        if (!cart.size) return;
+        const form = new FormData(checkoutForm);
+        if (!String(form.get('address') || '').trim()) {
+          errorBox.textContent = 'Please enter your village, area, and a nearby landmark so we can find you.';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        const method = form.get('payment_method');
+        if (method === 'upi' && !storeSettings.upi_id && !storeSettings.qr_image_url) {
+          errorBox.textContent = 'UPI payment is not configured yet. Please choose cash on delivery.';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        if (!databaseConfigured) {
+          errorBox.textContent = describeDatabaseError(new Error('Supabase has not been configured.'));
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        const submit = $('#place-order');
+        submit.disabled = true;
+        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sending your order...';
+        try {
+          const { data, error } = await db.rpc('place_order', {
+            p_customer_name: String(form.get('customer_name')).trim(),
+            p_phone: String(form.get('phone')).trim(),
+            p_address: String(form.get('address') || '').trim(),
+            p_items: [...cart.values()].map(({ item, quantity }) => ({ id: item.id, quantity })),
+            p_payment_method: method,
+            p_latitude: coordinates?.latitude ?? null,
+            p_longitude: coordinates?.longitude ?? null,
+            p_location_accuracy_meters: coordinates?.accuracy_meters ?? null,
+            p_location_captured_at: coordinates?.captured_at ?? null
+          });
+          if (error) throw error;
+          const createdOrder = Array.isArray(data) ? data[0] : data;
+          if (!createdOrder?.tracking_code) throw new Error('Order was saved, but a tracking code was not returned. Contact the cafe with your name and phone number.');
+          cart.clear();
+          coordinates = null;
+          renderCart();
+          checkoutForm.reset();
+          $('#location-status').classList.add('hidden');
+          $('#payment-qr').classList.add('hidden');
+          $('#location-status').classList.add('hidden');
+          closeCheckout();
+          beginTracking(createdOrder.tracking_code);
+          notify(`Order received! Save your private tracking code: ${createdOrder.tracking_code}`);
+        } catch (error) {
+          console.error('Order could not be placed:', error);
+          errorBox.textContent = `We couldn't place your order: ${describeDatabaseError(error)}`;
+          errorBox.classList.remove('hidden');
+        } finally {
+          submit.disabled = false;
+          submit.innerHTML = 'Place my order <i class="fa-solid fa-arrow-right ml-2"></i>';
         }
       });
 
@@ -439,94 +564,31 @@
         try {
           const { data, error } = await db.from('store_settings').select('upi_id,qr_image_url,cod_enabled,upi_enabled').eq('id', 1).maybeSingle();
           if (error) throw error;
-          if (!data) return;
-          $('#setting-upi').value = data.upi_id || '';
-          $('#setting-qr').value = data.qr_image_url || '';
-          $('#setting-cod-enabled').checked = data.cod_enabled;
-          $('#setting-upi-enabled').checked = data.upi_enabled;
-          updateQrPreview();
-        } catch (error) {
-          console.error('Unable to load payment settings:', error);
-          toast(`Payment settings could not be loaded: ${describeDatabaseError(error)}`);
-        }
-      }
-      function updateQrPreview() {
-        const url = $('#setting-qr').value.trim();
-        $('#qr-preview-wrap').classList.toggle('hidden', !url);
-        $('#qr-preview').src = url;
-      }
-      $('#setting-qr').addEventListener('input', updateQrPreview);
-      $('#settings-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const button = $('#settings-form').querySelector('button[type="submit"], button:not([type])');
-        button.disabled = true;
-        try {
-          const qrFile = $('#setting-qr-file').files[0];
-          const qrImageUrl = qrFile ? await uploadImage(qrFile, 'payment') : $('#setting-qr').value.trim();
-          if ($('#setting-upi-enabled').checked && !$('#setting-upi').value.trim() && !qrImageUrl) {
-            throw new Error('Add a UPI ID or upload its QR code before enabling UPI.');
+          if (data) {
+            storeSettings = { ...storeSettings, ...data };
+            $('#cod-option').classList.toggle('hidden', !storeSettings.cod_enabled);
+            $('#upi-option').classList.toggle('hidden', !storeSettings.upi_enabled);
+            if (!storeSettings.cod_enabled && storeSettings.upi_enabled) {
+              $('input[name="payment_method"][value="upi"]').checked = true;
+            } else if (!storeSettings.upi_enabled && storeSettings.cod_enabled) {
+              $('input[name="payment_method"][value="cod"]').checked = true;
+            }
+            if ($('input[name="payment_method"]:checked').value === 'upi') {
+              $('input[name="payment_method"]:checked').dispatchEvent(new Event('change'));
+            }
           }
-          const settings = {
-            id: 1,
-            store_name: 'Highway Bites',
-            upi_id: $('#setting-upi').value.trim(),
-            qr_image_url: qrImageUrl,
-            cod_enabled: $('#setting-cod-enabled').checked,
-            upi_enabled: $('#setting-upi-enabled').checked,
-            updated_at: new Date().toISOString()
-          };
-          const { error } = await db.from('store_settings').upsert(settings, { onConflict: 'id' });
-          if (error) throw error;
-          $('#setting-qr').value = qrImageUrl;
-          $('#setting-qr-file').value = '';
-          updateQrPreview();
-          toast('Payment methods saved');
         } catch (error) {
-          console.error('Payment settings could not be saved:', error);
-          toast(`Settings save failed: ${error.message}`);
-        } finally {
-          button.disabled = false;
+          console.error('Unable to load store payment settings:', error);
         }
-      });
-
-      function subscribeToOrders() {
-        if (realtimeChannel) db.removeChannel(realtimeChannel);
-        realtimeChannel = db.channel('highway-bites-live-orders').on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-          if (payload.eventType === 'INSERT') {
-            if (!orders.some((order) => order.id === payload.new.id)) orders = [payload.new, ...orders].slice(0, 100);
-            renderOrders();
-            playAlert();
-            toast(`New order from ${payload.new.customer_name || 'a customer'}!`);
-          } else if (payload.eventType === 'UPDATE') {
-            orders = orders.map((order) => order.id === payload.new.id ? payload.new : order);
-            renderOrders();
-          } else if (payload.eventType === 'DELETE') {
-            orders = orders.filter((order) => order.id !== payload.old.id);
-            renderOrders();
-          }
-        }).subscribe((status) => {
-          const connection = $('#connection');
-          const connected = status === 'SUBSCRIBED';
-          connection.innerHTML = `<span class="h-2 w-2 rounded-full ${connected ? 'bg-green-500' : 'bg-amber-400'}"></span>${connected ? 'Live updates on' : esc(status === 'CHANNEL_ERROR' ? 'Realtime error' : 'Connecting')}`;
-          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.error('Supabase Realtime connection status:', status);
-        });
       }
-      async function initialize() {
-        if (!db) {
-          toast(describeDatabaseError(new Error('Supabase has not been configured.')));
-          return;
-        }
-        await Promise.all([loadOrders(), loadMenu(), loadSettings(), loadDeliveryTeam()]);
-        subscribeToOrders();
+      renderCart();
+      savedTrackingCodes().forEach((code) => trackedCodes.add(code));
+      renderMyOrders();
+      if (trackedCodes.size) {
+        refreshMyOrders();
+        trackingTimer = setInterval(refreshMyOrders, 10000);
       }
-      if (db) {
-        db.auth.getSession().then(async ({ data, error }) => {
-          if (error) { console.error('Could not restore admin session:', error.message); return; }
-          if (!data.session?.user) return;
-          try { await authorizeAdmin(data.session.user); }
-          catch (authError) { console.error('Saved account is not an authorized admin:', authError); }
-        });
-      }
+      Promise.all([loadMenu(), loadSettings()]).catch((error) => console.error('App initialization failed:', error));
     })();
   </script>
 </body>
