@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Order delicious burgers, pizza and more from Highway Bites.">
+  <title>Highway Bites | Good food. Great pit stop.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: { DEFAULT: '#f97316', dark: '#ea580c', cream: '#fff7ed' } },
+          fontFamily: { display: ['Georgia', 'serif'] },
+          boxShadow: { card: '0 16px 45px rgba(17, 24, 39, .08)' }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .display { font-family: 'Playfair Display', Georgia, serif; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { scrollbar-width: none; }
+    .hero-pattern { background-image: radial-gradient(rgba(255,255,255,.1) 1px, transparent 1px); background-size: 18px 18px; }
+    .toast { animation: toast-in .22s ease-out; }
+    @keyframes toast-in { from { transform: translateY(12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  </style>
+</head>
+<body class="min-h-screen bg-[#fffdfa] text-gray-900">
+  <header class="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <a href="#" class="flex items-center gap-3" aria-label="Highway Bites home">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-orange-200"><i class="fa-solid fa-burger text-xl"></i></span>
+        <span><span class="block text-lg font-extrabold tracking-tight">Highway <span class="text-brand">Bites</span></span><span class="block text-[10px] font-bold uppercase tracking-[.2em] text-gray-400">Good food. Great pit stop.</span></span>
+      </a>
+      <nav class="hidden items-center gap-8 text-sm font-semibold text-gray-600 md:flex">
+        <a class="hover:text-brand" href="#menu">Our menu</a><button id="my-orders-open" class="hover:text-brand">My orders</button><a class="hover:text-brand" href="#why-us">Why Highway Bites</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button id="my-orders-open-mobile" class="grid h-10 w-10 place-items-center rounded-full border border-gray-200 text-gray-700 transition hover:border-brand hover:text-brand md:hidden" aria-label="My orders"><i class="fa-solid fa-receipt"></i></button>
+        <button id="cart-open" class="relative inline-flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand" aria-label="Open shopping cart">
+          <i class="fa-solid fa-bag-shopping"></i><span class="hidden sm:inline">Your cart</span><span id="cart-count" class="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px]">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div class="hero-pattern relative overflow-hidden rounded-[2rem] bg-gray-950 text-white">
+        <div class="absolute -right-16 -top-24 h-80 w-80 rounded-full bg-brand/30 blur-3xl"></div>
+        <div class="relative grid items-center gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.1fr_.9fr] lg:px-16">
+          <div class="max-w-xl">
+            <span class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-orange-200"><i class="fa-solid fa-sparkles"></i> Fresh off the grill</span>
+            <h1 class="display text-4xl font-extrabold leading-tight sm:text-6xl">Big cravings.<br><span class="text-brand">Bigger bites.</span></h1>
+            <p class="mt-5 max-w-md text-base leading-7 text-gray-300">Road-trip favorites, made fresh and served with a little extra love. Your next great pit stop starts here.</p>
+            <a href="#menu" class="mt-8 inline-flex items-center gap-3 rounded-full bg-brand px-6 py-3.5 font-extrabold text-white shadow-lg shadow-orange-950/30 transition hover:-translate-y-0.5 hover:bg-brand-dark">Explore the menu <i class="fa-solid fa-arrow-right"></i></a>
+            <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-300"><span><i class="fa-solid fa-star mr-1.5 text-yellow-400"></i>Made fresh to order</span><span><i class="fa-solid fa-location-dot mr-1.5 text-brand"></i>Good vibes, great food</span></div>
+          </div>
+          <div class="relative mx-auto w-full max-w-lg">
+            <div class="absolute inset-8 rounded-full bg-brand/25 blur-3xl"></div>
+            <img class="relative aspect-[4/3] w-full rounded-[1.75rem] object-cover shadow-2xl ring-1 ring-white/10" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1000&q=85" alt="Juicy Highway Bites burger with fresh toppings">
+            <div class="absolute -bottom-4 -left-2 rounded-2xl bg-white px-4 py-3 text-gray-900 shadow-xl sm:-left-6"><div class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-brand"><i class="fa-solid fa-fire"></i></span><span><strong class="block text-sm">Flame grilled</strong><span class="text-xs text-gray-500">Always fresh, never boring</span></span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why-us" class="mx-auto grid max-w-7xl gap-3 px-4 py-7 sm:grid-cols-3 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-leaf"></i></span><span><b class="block text-sm">Fresh ingredients</b><small class="text-gray-500">Goodness in every bite</small></span></div>
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-bolt"></i></span><span><b class="block text-sm">Made when you order</b><small class="text-gray-500">Hot, delicious, just for you</small></span></div>
+      <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4"><span class="grid h-11 w-11 place-items-center rounded-xl bg-orange-50 text-brand"><i class="fa-solid fa-heart"></i></span><span><b class="block text-sm">A little extra love</b><small class="text-gray-500">From our kitchen to your table</small></span></div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-orange-100 bg-orange-50 p-5 sm:p-7">
+        <div class="sm:col-span-2">
+          <p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Already ordered?</p>
+          <h2 class="mt-1 text-xl font-extrabold">Check your order updates</h2>
+          <p class="mt-1 text-sm text-gray-600">View your saved orders and their current status.</p>
+        </div>
+        <button id="my-orders-open-banner" type="button" class="shrink-0 rounded-xl bg-gray-900 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-brand"><i class="fa-solid fa-receipt mr-2"></i>My orders</button>
+      </div>
+    </section>
+
+    <div id="my-orders-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-gray-950/55 p-4" role="dialog" aria-modal="true" aria-labelledby="my-orders-title">
+      <section class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-[#fffdfa] shadow-2xl">
+        <header class="flex items-start justify-between border-b border-gray-100 px-5 py-4 sm:px-6">
+          <div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Your meal, step by step</p><h2 id="my-orders-title" class="mt-1 text-2xl font-extrabold">My orders</h2><p class="mt-1 text-sm text-gray-600">Orders placed on this device appear here automatically.</p></div>
+          <button id="my-orders-close" type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gray-100 hover:bg-gray-200" aria-label="Close my orders"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <div class="overflow-y-auto p-5 sm:p-6">
+          <form id="track-form" class="flex gap-2">
+          <label class="sr-only" for="tracking-code">Private order tracking code</label>
+          <input id="tracking-code" name="tracking_code" autocomplete="off" required class="min-w-0 flex-1 rounded-xl border border-orange-200 bg-white px-3 py-3 font-mono text-sm outline-none focus:border-brand" placeholder="Add tracking code">
+          <button class="shrink-0 rounded-xl bg-gray-900 px-4 py-3 text-sm font-extrabold text-white hover:bg-brand"><i class="fa-solid fa-plus mr-1"></i>Add order</button>
+        </form>
+          <div id="tracking-result" class="mt-4 space-y-3" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <section id="menu" class="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Something for every craving</p><h2 class="display mt-2 text-3xl font-extrabold sm:text-4xl">The good stuff</h2></div>
+        <p id="menu-status" class="text-sm text-gray-500">Fresh favorites, coming right up.</p>
+      </div>
+      <div id="categories" class="hide-scrollbar mt-7 flex gap-2 overflow-x-auto pb-2" aria-label="Filter menu by category"></div>
+      <div id="menu-grid" class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+      <div id="menu-empty" class="hidden rounded-3xl border border-dashed border-gray-200 py-16 text-center text-gray-500">No bites here yet. Check back soon!</div>
+    </section>
+  </main>
+
+  <footer class="border-t border-gray-100 bg-white">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-7 text-sm text-gray-500 sm:flex-row sm:px-6 lg:px-8">
+      <p>© <span id="year"></span> Highway Bites. Made fresh, served happy.</p><div class="flex gap-4"><a class="font-semibold text-gray-700 hover:text-brand" href="admin.html"><i class="fa-solid fa-lock mr-1.5"></i>Admin</a><a class="font-semibold text-gray-700 hover:text-brand" href="delivery.html"><i class="fa-solid fa-motorcycle mr-1.5"></i>Delivery staff</a></div>
+    </div>
+  </footer>
+
+  <div id="cart-backdrop" class="fixed inset-0 z-40 hidden bg-gray-950/40" aria-hidden="true"></div>
+  <aside id="cart-panel" class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md translate-x-full flex-col bg-white shadow-2xl transition-transform duration-300" aria-label="Shopping cart" aria-hidden="true">
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-5"><div><h2 class="text-xl font-extrabold">Your cart</h2><p id="cart-subtitle" class="mt-1 text-sm text-gray-500">A few good choices.</p></div><button id="cart-close" class="grid h-10 w-10 place-items-center rounded-full bg-gray-100 hover:bg-gray-200" aria-label="Close cart"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="cart-items" class="flex-1 overflow-y-auto px-5 py-4"></div>
+    <div class="border-t border-gray-100 px-5 py-5">
+      <div class="mb-4 flex justify-between text-sm text-gray-500"><span>Subtotal</span><span id="cart-total" class="font-extrabold text-gray-900">₹0</span></div>
+      <button id="checkout-open" class="w-full rounded-xl bg-brand px-4 py-3.5 font-extrabold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-gray-300" disabled>Continue to checkout <i class="fa-solid fa-arrow-right ml-2"></i></button>
+      <p class="mt-3 text-center text-xs text-gray-400">Taxes and any delivery fees are confirmed at checkout.</p>
+    </div>
+  </aside>
+
+  <div id="checkout-modal" class="fixed inset-0 z-[60] hidden items-center justify-center overflow-y-auto bg-gray-950/55 p-4">
+    <section class="my-auto w-full max-w-lg rounded-3xl bg-white shadow-2xl">
+      <div class="flex items-start justify-between border-b border-gray-100 px-6 py-5"><div><p class="text-xs font-extrabold uppercase tracking-widest text-brand">Almost there</p><h2 class="mt-1 text-2xl font-extrabold">Checkout</h2></div><button id="checkout-close" class="grid h-10 w-10 place-items-center rounded-full bg-gray-100" aria-label="Close checkout"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="checkout-form" class="space-y-4 p-6">
+        <label class="block text-sm font-bold">Your name<input required name="customer_name" maxlength="100" autocomplete="name" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="e.g. Alex Kumar"></label>
+        <label class="block text-sm font-bold">Phone number<input required name="phone" type="tel" maxlength="15" autocomplete="tel" pattern="[0-9]{7,15}" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="Digits only, including country code"></label>
+        <label class="block text-sm font-bold">Village, area &amp; nearby landmark<input name="address" required maxlength="500" autocomplete="street-address" class="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-brand focus:ring-2 focus:ring-orange-100" placeholder="Village / area, post office, school or other landmark"><span class="mt-1 block text-xs font-normal text-gray-500">If GPS is unavailable, this address and your phone number help us find you.</span></label>
+        <div class="rounded-xl bg-orange-50 p-3">
+          <p class="text-sm font-extrabold">Share GPS location <span class="font-medium text-gray-500">(optional)</span></p>
+          <p class="mt-1 text-xs leading-5 text-gray-600">GPS helps us find your delivery faster. If it does not work, continue with your village and landmark address above.</p>
+          <button id="location-button" type="button" class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand-dark"><i class="fa-solid fa-location-crosshairs"></i><span>Use my location</span></button><p id="location-status" role="status" aria-live="polite" class="mt-1 hidden text-xs text-gray-700"></p>
+        </div>
+        <fieldset id="payment-methods"><legend class="mb-2 text-sm font-bold">How would you like to pay?</legend><div class="grid grid-cols-2 gap-3">
+          <label id="cod-option" class="cursor-pointer"><input class="peer sr-only" type="radio" name="payment_method" value="cod" checked><span class="flex items-center gap-2 rounded-xl border border-gray-200 p-3 text-sm font-bold peer-checked:border-brand peer-checked:bg-orange-50"><i class="fa-solid fa-money-bill-wave text-brand"></i> Cash on delivery</span></label>
+          <label id="upi-option" class="cursor-pointer"><input class="peer sr-only" type="radio" name="payment_method" value="upi"><span class="flex items-center gap-2 rounded-xl border border-gray-200 p-3 text-sm font-bold peer-checked:border-brand peer-checked:bg-orange-50"><i class="fa-solid fa-qrcode text-brand"></i> UPI / QR</span></label>
+        </div></fieldset>
+        <div id="payment-qr" class="hidden rounded-2xl bg-orange-50 p-4 text-center"><p class="text-sm font-extrabold">Scan to pay</p><img id="qr-image" class="mx-auto mt-3 hidden h-40 w-40 rounded-xl bg-white object-contain p-2" alt="Store UPI payment QR code"><p id="upi-label" class="mt-2 text-sm text-gray-600"></p><p class="mt-2 text-xs text-gray-500">Place your order after completing payment. The team will confirm it.</p></div>
+        <div class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"><span class="text-sm font-semibold text-gray-600">Order total</span><strong id="checkout-total" class="text-lg">₹0</strong></div>
+        <p id="checkout-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"></p>
+        <button id="place-order" type="submit" class="w-full rounded-xl bg-gray-900 px-4 py-3.5 font-extrabold text-white transition hover:bg-brand disabled:cursor-wait disabled:opacity-60">Place my order <i class="fa-solid fa-arrow-right ml-2"></i></button>
+      </form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast fixed bottom-5 left-1/2 z-[80] hidden -translate-x-1/2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
+  <script>
+    (() => {
+      const { supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.HIGHWAY_BITES_CONFIG;
+      const databaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('PASTE_'));
+      const db = databaseConfigured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+      const fallbackItems = [
+        { id: 'demo-1', name: 'Highway Smash Burger', description: 'Double smash patty, cheddar, pickles and our signature sauce.', price: 249, category: 'Burgers', image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-2', name: 'Crispy Chicken Burger', description: 'Crunchy chicken, fresh lettuce and a creamy pepper mayo.', price: 219, category: 'Burgers', image_url: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-3', name: 'Loaded Roadside Fries', description: 'Golden fries piled high with cheese, herbs and a little kick.', price: 149, category: 'Sides', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80' },
+        { id: 'demo-4', name: 'Smoky BBQ Pizza', description: 'Smoky barbecue, mozzarella and colorful garden veggies.', price: 329, category: 'Pizza', image_url: 'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=700&q=80' }
+      ];
+      let menuItems = [];
+      let cart = new Map();
+      let selectedCategory = 'All';
+      let storeSettings = { upi_id: '', qr_image_url: '', cod_enabled: true, upi_enabled: true };
+      let coordinates = null;
+      let trackingTimer = null;
+      const trackedCodes = new Set();
+      const trackedOrders = new Map();
+      const $ = (selector) => document.querySelector(selector);
+      const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+      const money = (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(amount) || 0);
+      $('#year').textContent = new Date().getFullYear();
+
+      function describeDatabaseError(error) {
+        if (!databaseConfigured) {
+          return 'Add this project’s anon/publishable key to supabase-config.js to enable live orders.';
+        }
+        if (/customer delivery location|refresh your gps location|gps accuracy must/i.test(String(error?.message || error))) {
+          return 'GPS is optional. Your Supabase database still has the old GPS-required order function. Run gps-optional-migration.sql once in Supabase SQL Editor; then you can order using your village/area address without GPS.';
+        }
+        if (/failed to fetch/i.test(String(error?.message || error))) {
+          return `Cannot connect to Supabase at ${SUPABASE_URL}. Check that the project URL is correct, the project is active, and your internet connection is working.`;
+        }
+        return error?.message || 'An unexpected database error occurred. Please try again.';
+      }
+
+      function notify(message) {
+        const toast = $('#toast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        clearTimeout(notify.timeout);
+        notify.timeout = setTimeout(() => toast.classList.add('hidden'), 2800);
+      }
+
+      function renderTracking(order, code) {
+        const statusLabels = {
+          received: 'Order received',
+          confirmed: 'Order confirmed',
+          preparing: 'Being prepared',
+          ready: 'Ready',
+          out_for_delivery: 'Out for delivery',
+          delivered: 'Delivered',
+          completed: 'Completed',
+          cancelled: 'Cancelled'
+        };
+        const steps = ['received', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
+        const currentIndex = steps.indexOf(order.status === 'completed' ? 'delivered' : order.status);
+        const cancelled = order.status === 'cancelled';
+        return `<article class="rounded-2xl border border-orange-100 bg-white p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div><p class="text-xs font-bold uppercase tracking-wider text-gray-500">Order ${esc(String(order.order_id).slice(0, 8).toUpperCase())}</p><h3 class="mt-1 text-lg font-extrabold ${cancelled ? 'text-red-600' : 'text-brand'}">${esc(statusLabels[order.status] || order.status)}</h3></div>
+            <span class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-gray-700">${money(order.total)} · ${order.payment_method === 'upi' ? 'UPI' : 'Cash on delivery'}</span>
+          </div>
+          ${cancelled ? '<p class="mt-3 text-sm text-red-700">Please contact Highway Bites if you need help with this cancelled order.</p>' : `<ol class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">${steps.map((step, index) => `<li class="rounded-lg px-3 py-2 text-xs font-bold ${index <= currentIndex ? 'bg-orange-100 text-orange-900' : 'bg-gray-50 text-gray-400'}"><i class="fa-solid ${index <= currentIndex ? 'fa-circle-check' : 'fa-circle'} mr-1.5"></i>${statusLabels[step]}</li>`).join('')}</ol>`}
+          <div class="mt-4 border-t border-gray-100 pt-3">${(Array.isArray(order.items) ? order.items : []).map((item) => `<p class="flex justify-between gap-3 py-1 text-sm"><span>${esc(item.quantity)} × ${esc(item.name)}</span><span>${money(Number(item.price) * Number(item.quantity))}</span></p>`).join('')}</div>
+          <p class="mt-2 text-xs text-gray-500">Last updated ${new Date(order.updated_at || order.created_at).toLocaleString()}. Status refreshes automatically.</p>
+          <div class="mt-2 flex flex-wrap items-center justify-between gap-2"><p class="break-all text-xs text-gray-500">Private code: <span class="font-mono">${esc(code)}</span></p><button type="button" data-remove-order="${esc(code)}" class="text-xs font-bold text-gray-500 hover:text-red-600">Remove from this device</button></div>
+        </article>`;
+      }
+
+      function savedTrackingCodes() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('highwayBitesTrackingCodes') || '[]');
+          const codes = Array.isArray(saved) ? saved.filter((code) => typeof code === 'string') : [];
+          const previousCode = localStorage.getItem('highwayBitesTrackingCode');
+          if (previousCode && !codes.includes(previousCode)) codes.push(previousCode);
+          return [...new Set(codes)];
+        } catch (error) {
+          console.warn('Saved order list could not be read:', error);
+          return [];
+        }
+      }
+
+      function persistTrackingCodes() {
+        try {
+          localStorage.setItem('highwayBitesTrackingCodes', JSON.stringify([...trackedCodes]));
+          localStorage.removeItem('highwayBitesTrackingCode');
+        } catch (error) {
+          console.warn('Order history could not be saved on this device:', error);
+        }
+      }
+
+      function renderMyOrders() {
+        const result = $('#tracking-result');
+        result.innerHTML = trackedCodes.size ? [...trackedCodes].map((code) => {
+          const entry = trackedOrders.get(code);
+          if (entry?.order) return renderTracking(entry.order, code);
+          if (entry?.error) return `<article class="rounded-2xl border border-amber-200 bg-white p-4 text-sm text-amber-800">${esc(entry.error)} <button type="button" data-remove-order="${esc(code)}" class="ml-2 font-bold underline">Remove</button></article>`;
+          return `<article class="rounded-2xl border border-orange-100 bg-white p-4 text-sm text-gray-600"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading order ${esc(code.slice(0, 8))}…</article>`;
+        }).join('') : '<div class="rounded-2xl border border-dashed border-orange-200 bg-white p-6 text-center text-sm text-gray-500">No saved orders yet. Place an order, and it will show up here.</div>';
+      }
+
+      async function refreshMyOrders() {
+        if (!db || !trackedCodes.size) return;
+        await Promise.all([...trackedCodes].map(async (code) => {
+          const previous = trackedOrders.get(code);
+          if (previous?.order && ['delivered', 'completed', 'cancelled'].includes(previous.order.status)) return;
+          const { data, error } = await db.rpc('track_order', { p_tracking_code: code });
+          if (error) {
+            console.error('Order tracking lookup failed:', error.message);
+            trackedOrders.set(code, { error: `Could not load order ${code.slice(0, 8)}: ${error.message}` });
+            return;
+          }
+          const order = Array.isArray(data) ? data[0] : data;
+          trackedOrders.set(code, order ? { order } : { error: `No order matches code ${code.slice(0, 8)}. Check it or remove it.` });
+        }));
+        renderMyOrders();
+      }
+
+      function beginTracking(code) {
+        const cleanCode = code.trim().toLowerCase();
+        trackedCodes.add(cleanCode);
+        trackedOrders.delete(cleanCode);
+        persistTrackingCodes();
+        renderMyOrders();
+        refreshMyOrders();
+        if (!trackingTimer) trackingTimer = setInterval(refreshMyOrders, 10000);
+        setMyOrdersOpen(true);
+      }
+
+      $('#track-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const code = $('#tracking-code').value.trim();
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(code)) {
+          notify('Enter the full private tracking code shown after placing your order.');
+          return;
+        }
+        beginTracking(code);
+        $('#tracking-code').value = '';
+      });
+      $('#tracking-result').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-remove-order]');
+        if (!button) return;
+        const code = button.dataset.removeOrder;
+        trackedCodes.delete(code);
+        trackedOrders.delete(code);
+        persistTrackingCodes();
+        if (!trackedCodes.size && trackingTimer) {
+          clearInterval(trackingTimer);
+          trackingTimer = null;
+        }
+        renderMyOrders();
+      });
+
+      function itemPrice(item) {
+        return Math.round(Number(item.price) * (100 - Number(item.discount_percent || 0))) / 100;
+      }
+
+      function renderMenu() {
+        const categories = ['All', ...new Set(menuItems.map((item) => item.category).filter(Boolean))];
+        if (!categories.includes(selectedCategory)) selectedCategory = 'All';
+        $('#categories').innerHTML = categories.map((category) => `<button data-category="${esc(category)}" class="shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition ${category === selectedCategory ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:ring-brand hover:text-brand'}">${esc(category)}</button>`).join('');
+        const visible = menuItems.filter((item) => selectedCategory === 'All' || item.category === selectedCategory);
+        $('#menu-empty').classList.toggle('hidden', visible.length > 0);
+        $('#menu-grid').innerHTML = visible.map((item) => `<article class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-card transition hover:-translate-y-1">
+          <div class="relative overflow-hidden bg-orange-50"><img class="h-48 w-full object-cover transition duration-500 group-hover:scale-105" src="${esc(item.image_url || fallbackItems[0].image_url)}" alt="${esc(item.name)}" loading="lazy" onerror="this.src='${fallbackItems[0].image_url}'"><span class="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-gray-700">${esc(item.category)}</span>${Number(item.discount_percent) > 0 ? `<span class="absolute right-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-extrabold text-white">${esc(item.discount_percent)}% OFF</span>` : ''}</div>
+          <div class="p-4"><h3 class="text-lg font-extrabold">${esc(item.name)}</h3><p class="mt-1.5 min-h-10 text-sm leading-5 text-gray-500">${esc(item.description || 'A Highway Bites favorite, made fresh just for you.')}</p><div class="mt-4 flex items-center justify-between"><span class="flex items-baseline gap-2"><strong class="text-lg font-extrabold">${money(itemPrice(item))}</strong>${Number(item.discount_percent) > 0 ? `<del class="text-sm text-gray-400">${money(item.price)}</del>` : ''}</span><button data-add="${esc(item.id)}" class="grid h-10 w-10 place-items-center rounded-xl bg-orange-50 text-brand transition hover:bg-brand hover:text-white" aria-label="Add ${esc(item.name)} to cart"><i class="fa-solid fa-plus"></i></button></div></div>
+        </article>`).join('');
+      }
+
+      async function loadMenu() {
+        $('#menu-status').textContent = 'Loading the good stuff...';
+        try {
+          if (!db) throw new Error('Supabase has not been configured.');
+          const { data, error } = await db.from('menu_items').select('id,name,description,price,discount_percent,category,image_url,is_available').eq('is_available', true).order('created_at');
+          if (error) throw error;
+          menuItems = data || [];
+          $('#menu-status').textContent = menuItems.length ? 'Fresh favorites, coming right up.' : 'Our kitchen is updating the menu. Check back soon!';
+        } catch (error) {
+          console.error('Unable to load menu:', error);
+          menuItems = fallbackItems;
+          $('#menu-status').textContent = `Showing our favorites. ${describeDatabaseError(error)}`;
+        }
+        renderMenu();
+      }
+
+      function cartTotal() {
+        return [...cart.values()].reduce((sum, line) => sum + itemPrice(line.item) * line.quantity, 0);
+      }
+      function renderCart() {
+        const count = [...cart.values()].reduce((sum, line) => sum + line.quantity, 0);
+        $('#cart-count').textContent = count;
+        $('#cart-subtitle').textContent = count ? `${count} tasty ${count === 1 ? 'item' : 'items'}` : 'A few good choices.';
+        $('#cart-total').textContent = money(cartTotal());
+        $('#checkout-total').textContent = money(cartTotal());
+        $('#checkout-open').disabled = count === 0;
+        const lines = [...cart.values()];
+        $('#cart-items').innerHTML = lines.length ? lines.map(({ item, quantity }) => `<div class="flex gap-3 border-b border-gray-100 py-4"><img class="h-16 w-16 rounded-xl object-cover" src="${esc(item.image_url || fallbackItems[0].image_url)}" alt=""><div class="min-w-0 flex-1"><div class="flex justify-between gap-2"><h3 class="truncate font-bold">${esc(item.name)}</h3><span class="whitespace-nowrap text-sm font-extrabold">${money(itemPrice(item) * quantity)}</span></div><p class="mt-1 text-sm text-gray-500">${money(itemPrice(item))} each${Number(item.discount_percent) > 0 ? ` · ${esc(item.discount_percent)}% off` : ''}</p><div class="mt-2 inline-flex items-center gap-3 rounded-lg bg-gray-100 px-2 py-1"><button data-change="${esc(item.id)}" data-delta="-1" aria-label="Remove one ${esc(item.name)}">−</button><span class="text-sm font-bold">${quantity}</span><button data-change="${esc(item.id)}" data-delta="1" aria-label="Add one ${esc(item.name)}">+</button></div></div></div>`).join('') : '<div class="grid h-full place-items-center text-center"><div><span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-orange-50 text-2xl text-brand"><i class="fa-solid fa-basket-shopping"></i></span><p class="mt-4 font-bold">Your cart is taking a pit stop</p><p class="mt-1 text-sm text-gray-500">Add something delicious from our menu.</p></div></div>';
+      }
+      function setCartOpen(isOpen) {
+        $('#cart-panel').classList.toggle('translate-x-full', !isOpen);
+        $('#cart-panel').setAttribute('aria-hidden', String(!isOpen));
+        $('#cart-backdrop').classList.toggle('hidden', !isOpen);
+        document.body.classList.toggle('overflow-hidden', isOpen);
+      }
+
+      $('#categories').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-category]');
+        if (button) { selectedCategory = button.dataset.category; renderMenu(); }
+      });
+      $('#menu-grid').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-add]');
+        if (!button) return;
+        const item = menuItems.find((entry) => String(entry.id) === button.dataset.add);
+        if (!item) return;
+        const existing = cart.get(String(item.id));
+        cart.set(String(item.id), { item, quantity: (existing?.quantity || 0) + 1 });
+        renderCart();
+        notify(`${item.name} added to your cart`);
+      });
+      $('#cart-items').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-change]');
+        if (!button) return;
+        const id = button.dataset.change;
+        const line = cart.get(id);
+        if (!line) return;
+        line.quantity += Number(button.dataset.delta);
+        if (line.quantity < 1) cart.delete(id);
+        else cart.set(id, line);
+        renderCart();
+      });
+      $('#cart-open').addEventListener('click', () => setCartOpen(true));
+      $('#cart-close').addEventListener('click', () => setCartOpen(false));
+      $('#cart-backdrop').addEventListener('click', () => setCartOpen(false));
+      function setMyOrdersOpen(isOpen) {
+        $('#my-orders-modal').classList.toggle('hidden', !isOpen);
+        $('#my-orders-modal').classList.toggle('flex', isOpen);
+        document.body.classList.toggle('overflow-hidden', isOpen);
+        if (isOpen) {
+          renderMyOrders();
+          refreshMyOrders();
+          $('#my-orders-close').focus();
+        }
+      }
+      ['#my-orders-open', '#my-orders-open-mobile', '#my-orders-open-banner'].forEach((selector) => {
+        $(selector).addEventListener('click', () => setMyOrdersOpen(true));
+      });
+      $('#my-orders-close').addEventListener('click', () => setMyOrdersOpen(false));
+      $('#my-orders-modal').addEventListener('click', (event) => {
+        if (event.target === $('#my-orders-modal')) setMyOrdersOpen(false);
+      });
+      $('#checkout-open').addEventListener('click', () => {
+        setCartOpen(false);
+        $('#checkout-modal').classList.remove('hidden');
+        $('#checkout-modal').classList.add('flex');
+      });
+      function closeCheckout() {
+        $('#checkout-modal').classList.add('hidden');
+        $('#checkout-modal').classList.remove('flex');
+      }
+      $('#checkout-close').addEventListener('click', closeCheckout);
+      $('#checkout-modal').addEventListener('click', (event) => { if (event.target === $('#checkout-modal')) closeCheckout(); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeCheckout(); setCartOpen(false); setMyOrdersOpen(false); } });
+      document.querySelectorAll('[name="payment_method"]').forEach((input) => input.addEventListener('change', () => {
+        const isUpi = $('input[name="payment_method"]:checked').value === 'upi';
+        $('#payment-qr').classList.toggle('hidden', !isUpi);
+        $('#qr-image').classList.toggle('hidden', !isUpi || !storeSettings.qr_image_url);
+        $('#qr-image').src = storeSettings.qr_image_url || '';
+        $('#upi-label').textContent = storeSettings.upi_id ? `UPI ID: ${storeSettings.upi_id}` : 'UPI payment details are not available yet. Please choose cash on delivery.';
+        $('#place-order').disabled = isUpi && (!storeSettings.upi_enabled || (!storeSettings.upi_id && !storeSettings.qr_image_url));
+      }));
+      function captureCustomerLocation() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('GPS is not available in this browser. You can still order using your village and landmark address.'));
+            return;
+          }
+          let bestPosition = null;
+          let watchId = null;
+          let settled = false;
+          const finish = (position, error) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+            if (position) resolve(position);
+            else reject(error);
+          };
+          const timer = setTimeout(() => {
+            if (bestPosition) finish(bestPosition);
+            else finish(null, new Error('GPS took too long. You can still place the order using your village and landmark address.'));
+          }, 18000);
+          const locationError = (error) => {
+            const messages = {
+              1: 'Location permission was denied. You can still order using your village and landmark address.',
+              2: 'GPS could not find your location. You can still order using your village and landmark address.',
+              3: 'GPS took too long. You can still place the order using your address.'
+            };
+            finish(bestPosition, new Error(messages[error.code] || 'GPS location is unavailable. Continue using your address.'));
+          };
+          watchId = navigator.geolocation.watchPosition((position) => {
+            if (!bestPosition || position.coords.accuracy < bestPosition.coords.accuracy) bestPosition = position;
+            if (position.coords.accuracy <= 50) finish(position);
+          }, locationError, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+        });
+      }
+
+      async function updateCustomerLocation() {
+        const status = $('#location-status');
+        status.classList.remove('hidden');
+        coordinates = null;
+        const button = $('#location-button');
+        button.disabled = true;
+        button.classList.add('cursor-wait', 'opacity-60');
+        button.querySelector('span').textContent = 'Finding location...';
+        status.textContent = 'Finding the best available GPS fix (up to 18 seconds). You can still order using your address.';
+        try {
+          const position = await captureCustomerLocation();
+          coordinates = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy_meters: position.coords.accuracy,
+            captured_at: new Date(position.timestamp).toISOString()
+          };
+          status.textContent = `Location added (about ${Math.round(coordinates.accuracy_meters)} m accuracy).`;
+        } catch (error) {
+          console.info('Optional customer GPS location was not captured:', error.message);
+          status.textContent = error.message;
+        } finally {
+          button.disabled = false;
+          button.classList.remove('cursor-wait', 'opacity-60');
+          button.querySelector('span').textContent = 'Try GPS again (optional)';
+        }
+      }
+
+      $('#location-button').addEventListener('click', updateCustomerLocation);
+      $('#checkout-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const checkoutForm = event.currentTarget;
+        const errorBox = $('#checkout-error');
+        errorBox.classList.add('hidden');
+        if (!cart.size) return;
+        const form = new FormData(checkoutForm);
+        if (!String(form.get('address') || '').trim()) {
+          errorBox.textContent = 'Please enter your village, area, and a nearby landmark so we can find you.';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        const method = form.get('payment_method');
+        if (method === 'upi' && !storeSettings.upi_id && !storeSettings.qr_image_url) {
+          errorBox.textContent = 'UPI payment is not configured yet. Please choose cash on delivery.';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        if (!databaseConfigured) {
+          errorBox.textContent = describeDatabaseError(new Error('Supabase has not been configured.'));
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        const submit = $('#place-order');
+        submit.disabled = true;
+        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sending your order...';
+        try {
+          const { data, error } = await db.rpc('place_order', {
+            p_customer_name: String(form.get('customer_name')).trim(),
+            p_phone: String(form.get('phone')).trim(),
+            p_address: String(form.get('address') || '').trim(),
+            p_items: [...cart.values()].map(({ item, quantity }) => ({ id: item.id, quantity })),
+            p_payment_method: method,
+            p_latitude: coordinates?.latitude ?? null,
+            p_longitude: coordinates?.longitude ?? null,
+            p_location_accuracy_meters: coordinates?.accuracy_meters ?? null,
+            p_location_captured_at: coordinates?.captured_at ?? null
+          });
+          if (error) throw error;
+          const createdOrder = Array.isArray(data) ? data[0] : data;
+          if (!createdOrder?.tracking_code) throw new Error('Order was saved, but a tracking code was not returned. Contact the cafe with your name and phone number.');
+          cart.clear();
+          coordinates = null;
+          renderCart();
+          checkoutForm.reset();
+          $('#location-status').classList.add('hidden');
+          $('#payment-qr').classList.add('hidden');
+          $('#location-status').classList.add('hidden');
+          closeCheckout();
+          beginTracking(createdOrder.tracking_code);
+          notify(`Order received! Save your private tracking code: ${createdOrder.tracking_code}`);
+        } catch (error) {
+          console.error('Order could not be placed:', error);
+          errorBox.textContent = `We couldn't place your order: ${describeDatabaseError(error)}`;
+          errorBox.classList.remove('hidden');
+        } finally {
+          submit.disabled = false;
+          submit.innerHTML = 'Place my order <i class="fa-solid fa-arrow-right ml-2"></i>';
+        }
+      });
+
+      async function loadSettings() {
+        if (!db) return;
+        try {
+          const { data, error } = await db.from('store_settings').select('upi_id,qr_image_url,cod_enabled,upi_enabled').eq('id', 1).maybeSingle();
+          if (error) throw error;
+          if (data) {
+            storeSettings = { ...storeSettings, ...data };
+            $('#cod-option').classList.toggle('hidden', !storeSettings.cod_enabled);
+            $('#upi-option').classList.toggle('hidden', !storeSettings.upi_enabled);
+            if (!storeSettings.cod_enabled && storeSettings.upi_enabled) {
+              $('input[name="payment_method"][value="upi"]').checked = true;
+            } else if (!storeSettings.upi_enabled && storeSettings.cod_enabled) {
+              $('input[name="payment_method"][value="cod"]').checked = true;
+            }
+            if ($('input[name="payment_method"]:checked').value === 'upi') {
+              $('input[name="payment_method"]:checked').dispatchEvent(new Event('change'));
+            }
+          }
+        } catch (error) {
+          console.error('Unable to load store payment settings:', error);
+        }
+      }
+      renderCart();
+      savedTrackingCodes().forEach((code) => trackedCodes.add(code));
+      renderMyOrders();
+      if (trackedCodes.size) {
+        refreshMyOrders();
+        trackingTimer = setInterval(refreshMyOrders, 10000);
+      }
+      Promise.all([loadMenu(), loadSettings()]).catch((error) => console.error('App initialization failed:', error));
+    })();
+  </script>
+</body>
+</html>
