@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <style>body{font-family:'DM Sans',sans-serif}.toast{animation:appear .2s ease-out}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
+  <style>body{font-family:'DM Sans',sans-serif}.toast{animation:appear .2s ease-out}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@media print{body.receipt-printing *{visibility:hidden!important}body.receipt-printing #receipt-print,body.receipt-printing #receipt-print *{visibility:visible!important}body.receipt-printing #receipt-print{display:block!important;position:absolute;inset:0 auto auto 0;width:100%;padding:24px;background:#fff;color:#111;font:14px Arial,sans-serif}body.receipt-printing #receipt-print h1{font-size:24px}body.receipt-printing #receipt-print .receipt-row{display:flex;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #ddd}body.receipt-printing #receipt-print .receipt-total{font-size:18px;font-weight:bold;margin-top:12px}}</style>
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-900">
   <div id="login-screen" class="grid min-h-screen place-items-center bg-gray-950 px-4 py-10">
@@ -39,7 +39,60 @@
     </header>
     <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div class="flex flex-wrap items-end justify-between gap-4"><div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Your cafe, at a glance</p><h1 class="mt-1 text-3xl font-extrabold">Dashboard</h1><p class="mt-1 text-sm text-gray-500">Orders update live. New order alerts play a sound.</p></div><button id="refresh-orders" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold hover:border-brand"><i class="fa-solid fa-rotate-right mr-2"></i>Refresh orders</button></div>
-      <div class="mt-6 grid gap-4 sm:grid-cols-3"><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Active orders</p><p id="active-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Today's orders</p><p id="today-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Today's sales</p><p id="today-sales" class="mt-1 text-3xl font-extrabold">₹0</p></div></div>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5"><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Active orders</p><p id="active-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Selected day orders</p><p id="today-count" class="mt-1 text-3xl font-extrabold">0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Selected day total sales</p><p id="today-sales" class="mt-1 text-3xl font-extrabold">₹0</p></div><div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-gray-500">Online sales</p><p id="online-sales" class="mt-1 text-2xl font-extrabold">₹0</p></div><div class="rounded-2xl border border-orange-100 bg-orange-50 p-5 shadow-sm"><p class="text-sm font-semibold text-orange-800">Offline / dine-in</p><p id="counter-sales" class="mt-1 text-2xl font-extrabold text-brand">₹0</p></div></div>
+      <section class="mt-8 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4 sm:px-6">
+          <div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Cash &amp; sales close</p><h2 class="mt-1 text-xl font-extrabold">Daily report</h2><p class="mt-1 text-xs text-gray-500">Sales date and cash day follow India time (IST).</p></div>
+          <div class="flex flex-wrap items-center gap-2"><label for="report-date" class="text-sm font-bold">Report date</label><input id="report-date" type="date" class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold"><button id="report-export" type="button" class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-bold hover:border-brand"><i class="fa-solid fa-download mr-1"></i>Export CSV</button></div>
+        </div>
+        <div class="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_1.2fr]">
+          <div class="space-y-4">
+            <form id="opening-balance-form" class="rounded-xl bg-orange-50 p-4">
+              <h3 class="font-extrabold">Opening cash balance</h3><p class="mt-1 text-xs leading-5 text-gray-600">At the start of this day, enter the cash physically in the drawer. Set it for each business day.</p>
+              <div class="mt-3 flex gap-2"><label class="sr-only" for="opening-balance">Opening cash balance</label><input id="opening-balance" type="number" min="0" max="100000000" step="0.01" required class="min-w-0 flex-1 rounded-lg border border-orange-200 bg-white px-3 py-2.5" placeholder="₹ Opening cash"><button class="shrink-0 rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-bold text-white hover:bg-brand">Save opening</button></div>
+              <p id="opening-balance-state" class="mt-2 text-xs font-semibold text-gray-600" aria-live="polite">Opening balance not set for this day.</p>
+            </form>
+            <form id="cash-expense-form" class="rounded-xl border border-gray-100 p-4">
+              <h3 class="font-extrabold">Cash expense / withdrawal</h3><p class="mt-1 text-xs text-gray-500">Record cash taken from the drawer; it reduces expected closing cash.</p>
+              <div class="mt-3 grid gap-2 sm:grid-cols-[.7fr_1fr_auto]"><label class="sr-only" for="cash-expense-amount">Expense amount</label><input id="cash-expense-amount" type="number" min="0.01" max="100000000" step="0.01" required class="min-w-0 rounded-lg border border-gray-200 px-3 py-2.5" placeholder="Amount ₹"><label class="sr-only" for="cash-expense-note">Expense description</label><input id="cash-expense-note" maxlength="250" required class="min-w-0 rounded-lg border border-gray-200 px-3 py-2.5" placeholder="What was cash used for?"><button class="rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-bold hover:border-brand">Add expense</button></div>
+            </form>
+          </div>
+          <div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl border border-gray-100 p-4"><p class="text-xs font-bold uppercase tracking-wide text-gray-500">Online sales · <span id="report-online-count">0</span> orders</p><p id="report-online-sales" class="mt-1 text-2xl font-extrabold">₹0</p></div>
+              <div class="rounded-xl border border-orange-100 bg-orange-50 p-4"><p class="text-xs font-bold uppercase tracking-wide text-orange-800">Offline / dine-in · <span id="report-offline-count">0</span> bills</p><p id="report-offline-sales" class="mt-1 text-2xl font-extrabold text-brand">₹0</p></div>
+              <div class="rounded-xl border border-gray-100 p-4"><p class="text-xs font-bold uppercase tracking-wide text-gray-500">Cash added to drawer</p><p id="report-cash-in" class="mt-1 text-xl font-extrabold">₹0</p><p id="report-cash-breakdown" class="mt-1 text-xs leading-5 text-gray-500">Counter cash ₹0 · Delivered COD ₹0</p></div>
+              <div class="rounded-xl border border-gray-100 p-4"><p class="text-xs font-bold uppercase tracking-wide text-gray-500">UPI / card offline sales</p><p id="report-noncash" class="mt-1 text-xl font-extrabold">₹0</p><p class="mt-1 text-xs text-gray-500">Recorded separately; not counted as drawer cash.</p></div>
+            </div>
+            <div class="mt-3 rounded-2xl bg-gray-900 p-4 text-white">
+              <div class="flex justify-between gap-3 text-sm"><span>Opening cash</span><span id="report-opening">Not set</span></div>
+              <div class="mt-2 flex justify-between gap-3 text-sm"><span>Cash collected (counter + delivered COD)</span><span id="report-cash-total">₹0</span></div>
+              <div class="mt-2 flex justify-between gap-3 text-sm"><span>Less cash expenses</span><span id="report-expenses">−₹0</span></div>
+              <div class="mt-3 flex justify-between gap-3 border-t border-white/20 pt-3"><strong>Expected closing cash</strong><strong id="report-closing" class="text-xl text-orange-300">Not available</strong></div>
+              <p class="mt-2 text-[11px] leading-4 text-gray-300">Closing = opening + cash counter sales + delivered/completed COD − recorded expenses. Online prepaid payments stay out of drawer cash.</p>
+            </div>
+            <div class="mt-4"><h3 class="text-sm font-extrabold">Cash expenses for this date</h3><div id="cash-expense-list" class="mt-2 divide-y divide-gray-100 rounded-xl border border-gray-100 px-3"></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="mt-8 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm sm:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="text-xs font-extrabold uppercase tracking-[.2em] text-brand">Point of sale</p><h2 class="mt-1 text-2xl font-extrabold">New offline bill</h2><p class="mt-1 text-sm text-gray-500">For walk-in, dine-in, and takeaway sales. Customer details are optional.</p></div><span class="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700"><i class="fa-solid fa-circle-check mr-1"></i>Records directly in sales</span></div>
+        <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1fr]">
+          <div><h3 class="text-sm font-extrabold">Available items</h3><div id="pos-menu" class="mt-2 grid max-h-80 gap-2 overflow-y-auto sm:grid-cols-2"></div></div>
+          <div>
+            <h3 class="text-sm font-extrabold">Bill items</h3><div id="pos-cart" class="mt-2 min-h-24 rounded-xl bg-gray-50 p-3"></div>
+            <div class="mt-3 grid gap-3 sm:grid-cols-2">
+              <label class="block text-sm font-bold">Order type<select id="pos-service-type" class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 font-normal"><option value="dine_in">Dine-in</option><option value="takeaway">Takeaway / counter</option></select></label>
+              <label class="block text-sm font-bold">Paid by<select id="pos-payment-method" class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 font-normal"><option value="cash">Cash</option><option value="upi">UPI</option><option value="card">Card</option></select></label>
+              <label class="block text-sm font-bold">Customer name <span class="font-normal text-gray-400">(optional)</span><input id="pos-customer-name" maxlength="100" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal" placeholder="Walk-in customer"></label>
+              <label class="block text-sm font-bold">Phone <span class="font-normal text-gray-400">(optional)</span><input id="pos-customer-phone" type="tel" maxlength="15" inputmode="numeric" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2.5 font-normal" placeholder="Digits only"></label>
+            </div>
+            <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-4"><span class="font-bold">Bill total</span><strong id="pos-total" class="text-xl">₹0</strong></div>
+            <button id="pos-create-sale" type="button" class="mt-3 w-full rounded-xl bg-brand px-4 py-3.5 font-extrabold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-gray-300" disabled><i class="fa-solid fa-receipt mr-2"></i>Record sale &amp; print bill</button>
+            <button id="pos-print-last" type="button" class="mt-2 hidden w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-bold hover:border-brand"><i class="fa-solid fa-print mr-2"></i>Print last bill</button>
+          </div>
+        </div>
+      </section>
       <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1.4fr_.8fr]">
         <section class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4"><div><h2 class="text-lg font-extrabold">Live orders</h2><p class="text-xs text-gray-500">Newest orders appear first</p></div><select id="order-filter" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold"><option value="active">Active orders</option><option value="all">All orders</option><option value="completed">Completed / cancelled</option></select></div>
@@ -98,6 +151,7 @@
     </form>
   </div>
   <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 hidden -translate-x-1/2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-xl"></div>
+  <div id="receipt-print" class="hidden"></div>
   <script>
     (() => {
       const { supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY } = window.HIGHWAY_BITES_CONFIG;
@@ -118,6 +172,9 @@
       let orders = [];
       let menuItems = [];
       let deliveryUsers = [];
+      let dailyCashReport = null;
+      const counterCart = new Map();
+      let lastCounterSale = null;
       let realtimeChannel = null;
       let soundContext = null;
       let authenticated = false;
@@ -201,8 +258,17 @@
         } catch (error) { console.warn('Order alert sound unavailable:', error); }
       }
       function dayStart() {
-        const now = new Date();
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        const parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).formatToParts(new Date());
+        const part = (type) => parts.find((entry) => entry.type === type)?.value;
+        return `${part('year')}-${part('month')}-${part('day')}T00:00:00+05:30`;
+      }
+      function businessDate() {
+        return dayStart().slice(0, 10);
       }
       function renderOrders() {
         const filter = $('#order-filter').value;
@@ -214,27 +280,166 @@
           const options = Object.entries(statusLabels).map(([status, label]) => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${label}</option>`).join('');
           const deliveryOptions = `<option value="">Not assigned</option>${deliveryUsers.filter((driver) => driver.is_active || order.assigned_delivery_user === driver.user_id).map((driver) => `<option value="${esc(driver.user_id)}" ${order.assigned_delivery_user === driver.user_id ? 'selected' : ''}>${esc(driver.name)}${driver.is_active ? '' : ' (paused)'}</option>`).join('')}`;
           const location = order.latitude != null && order.longitude != null ? `<a class="font-semibold text-brand hover:underline" href="https://maps.google.com/?q=${encodeURIComponent(`${order.latitude},${order.longitude}`)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-dot mr-1"></i>Open customer GPS location</a><span class="ml-2 text-xs text-gray-500">${order.location_accuracy_meters != null ? `Reported GPS accuracy ±${Math.round(order.location_accuracy_meters)} m` : 'GPS accuracy not recorded'}${order.location_captured_at ? ` · captured ${new Date(order.location_captured_at).toLocaleTimeString()}` : ''}</span>` : '';
-          return `<article class="p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><div class="flex flex-wrap items-center gap-2"><h3 class="font-extrabold">${esc(order.customer_name)}</h3><span class="rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-gray-600">#${esc(String(order.id).slice(0, 8))}</span></div><p class="mt-1 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</p></div><select data-status="${esc(order.id)}" aria-label="Update order status" class="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs font-bold">${options}</select></div>
+          const sourceLabel = order.order_source === 'counter' ? (order.service_type === 'dine_in' ? 'Offline · Dine-in' : 'Offline · Takeaway') : 'Online · Delivery';
+          const paymentLabel = { cod: 'Cash on delivery', cash: 'Cash', upi: 'UPI', card: 'Card' }[order.payment_method] || order.payment_method;
+          return `<article class="p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><div class="flex flex-wrap items-center gap-2"><h3 class="font-extrabold">${esc(order.customer_name)}</h3><span class="rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-gray-600">#${esc(String(order.id).slice(0, 8))}</span><span class="rounded-full ${order.order_source === 'counter' ? 'bg-orange-100 text-orange-800' : 'bg-blue-50 text-blue-700'} px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide">${esc(sourceLabel)}</span></div><p class="mt-1 text-xs text-gray-500">${new Date(order.created_at).toLocaleString()}</p></div><div class="flex items-center gap-2">${order.order_source === 'counter' ? `<button type="button" data-print-order="${esc(order.id)}" class="rounded-lg border border-gray-200 px-2.5 py-2 text-xs font-bold hover:border-brand"><i class="fa-solid fa-print mr-1"></i>Bill</button>` : ''}<select data-status="${esc(order.id)}" aria-label="Update order status" class="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs font-bold">${options}</select></div></div>
             <div class="mt-4 rounded-xl bg-gray-50 p-3">${items.map((item) => `<div class="flex justify-between gap-3 py-1 text-sm"><span>${esc(item.quantity)} × ${esc(item.name)}</span><span class="font-semibold">${money(Number(item.price) * Number(item.quantity))}</span></div>`).join('')}</div>
-            <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm"><div><span class="font-extrabold">${money(order.total)}</span><span class="ml-2 text-xs text-gray-500">${order.payment_method === 'upi' ? 'UPI' : 'Cash on delivery'} · ${esc(order.payment_status)}</span></div><a href="tel:${esc(order.phone)}" class="font-semibold text-gray-600 hover:text-brand"><i class="fa-solid fa-phone mr-1"></i>${esc(order.phone)}</a></div>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm"><div><span class="font-extrabold">${money(order.total)}</span><span class="ml-2 text-xs text-gray-500">${esc(paymentLabel)} · ${esc(order.payment_status)}</span></div>${order.phone ? `<a href="tel:${esc(order.phone)}" class="font-semibold text-gray-600 hover:text-brand"><i class="fa-solid fa-phone mr-1"></i>${esc(order.phone)}</a>` : '<span class="text-xs text-gray-400">Walk-in · no phone</span>'}</div>
             ${order.address ? `<p class="mt-2 text-sm text-gray-500"><i class="fa-solid fa-house mr-1 text-gray-400"></i>${esc(order.address)}</p>` : ''}
-            ${location ? `<p class="mt-2 text-sm">${location}</p>` : '<p class="mt-2 text-xs text-amber-700">No GPS fix was shared. Use the customer village/landmark address and phone.</p>'}
-            <label class="mt-3 block text-xs font-bold text-gray-600">Delivery person<select data-assignment="${esc(order.id)}" aria-label="Assign delivery person" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold">${deliveryOptions}</select></label>
+            ${order.order_source !== 'counter' ? (location ? `<p class="mt-2 text-sm">${location}</p>` : '<p class="mt-2 text-xs text-amber-700">No GPS fix was shared. Use the customer village/landmark address and phone.</p>') : ''}
+            ${order.order_source !== 'counter' ? `<label class="mt-3 block text-xs font-bold text-gray-600">Delivery person<select data-assignment="${esc(order.id)}" aria-label="Assign delivery person" class="mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold">${deliveryOptions}</select></label>` : ''}
           </article>`;
         }).join('');
         const active = orders.filter((order) => !['delivered', 'completed', 'cancelled'].includes(order.status));
-        const todayOrders = orders.filter((order) => new Date(order.created_at) >= new Date(dayStart()));
         $('#active-count').textContent = active.length;
-        $('#today-count').textContent = todayOrders.length;
-        $('#today-sales').textContent = money(todayOrders.reduce((sum, order) => sum + Number(order.total), 0));
+        $('#today-count').textContent = dailyCashReport ? Number(dailyCashReport.online_order_count) + Number(dailyCashReport.offline_order_count) : '—';
+        $('#today-sales').textContent = dailyCashReport ? money(Number(dailyCashReport.online_sales) + Number(dailyCashReport.offline_sales)) : '—';
+        $('#online-sales').textContent = dailyCashReport ? money(dailyCashReport.online_sales) : '—';
+        $('#counter-sales').textContent = dailyCashReport ? money(dailyCashReport.offline_sales) : '—';
       }
+      function renderDailyCashReport() {
+        const report = dailyCashReport;
+        if (!report) return;
+        $('#report-online-sales').textContent = money(report.online_sales);
+        $('#report-offline-sales').textContent = money(report.offline_sales);
+        $('#report-online-count').textContent = Number(report.online_order_count);
+        $('#report-offline-count').textContent = Number(report.offline_order_count);
+        $('#report-cash-in').textContent = money(Number(report.online_cod_collected) + Number(report.offline_cash_collected));
+        $('#report-cash-breakdown').textContent = `Counter cash ${money(report.offline_cash_collected)} · Delivered COD ${money(report.online_cod_collected)}`;
+        $('#report-noncash').textContent = money(Number(report.offline_upi_sales) + Number(report.offline_card_sales));
+        $('#report-opening').textContent = report.opening_balance_set ? money(report.opening_balance) : 'Not set';
+        $('#report-cash-total').textContent = money(Number(report.online_cod_collected) + Number(report.offline_cash_collected));
+        $('#report-expenses').textContent = `−${money(report.cash_expenses)}`;
+        $('#report-closing').textContent = report.opening_balance_set ? money(report.closing_balance) : 'Set opening balance';
+        $('#opening-balance-state').textContent = report.opening_balance_set
+          ? `Opening balance saved: ${money(report.opening_balance)}. You can update it if needed.`
+          : 'Opening balance not set for this day; closing balance will appear after you save it.';
+        $('#opening-balance').value = report.opening_balance_set ? Number(report.opening_balance).toFixed(2) : '';
+        const expenses = Array.isArray(report.expenses) ? report.expenses : [];
+        $('#cash-expense-list').innerHTML = expenses.length ? expenses.map((expense) => `<div class="flex items-center justify-between gap-3 py-2"><div class="min-w-0"><p class="truncate text-sm font-semibold">${esc(expense.note)}</p><p class="text-xs text-gray-500">${new Date(expense.created_at).toLocaleTimeString()}</p></div><span class="shrink-0 text-sm font-bold">${money(expense.amount)}</span><button type="button" data-void-expense="${esc(expense.id)}" class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600" aria-label="Void ${esc(expense.note)}"><i class="fa-solid fa-xmark"></i></button></div>`).join('') : '<p class="py-3 text-sm text-gray-500">No cash expenses recorded for this date.</p>';
+        renderOrders();
+      }
+      async function loadDailyCashReport() {
+        const { data, error } = await db.rpc('get_daily_cash_report', {
+          p_business_date: $('#report-date').value || businessDate()
+        });
+        if (error) throw error;
+        dailyCashReport = Array.isArray(data) ? data[0] : data;
+        if (!dailyCashReport) throw new Error('No daily report was returned for this date.');
+        renderDailyCashReport();
+      }
+      $('#report-date').value = businessDate();
+      $('#report-date').addEventListener('change', () => {
+        dailyCashReport = null;
+        renderOrders();
+        loadDailyCashReport().catch((error) => {
+          console.error('Daily report could not be loaded:', error);
+          toast(`Daily report could not be loaded: ${describeDatabaseError(error)}. Run daily-cash-report-migration.sql.`);
+        });
+      });
+      $('#opening-balance-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const button = event.currentTarget.querySelector('button');
+        button.disabled = true;
+        try {
+          const { error } = await db.rpc('set_daily_opening_balance', {
+            p_business_date: $('#report-date').value,
+            p_opening_balance: Number($('#opening-balance').value)
+          });
+          if (error) throw error;
+          await loadDailyCashReport();
+          toast('Opening cash balance saved');
+        } catch (error) {
+          console.error('Opening balance could not be saved:', error);
+          toast(`Opening balance could not be saved: ${describeDatabaseError(error)}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+      $('#cash-expense-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector('button');
+        button.disabled = true;
+        try {
+          const { error } = await db.rpc('record_cash_expense', {
+            p_business_date: $('#report-date').value,
+            p_amount: Number($('#cash-expense-amount').value),
+            p_note: $('#cash-expense-note').value.trim()
+          });
+          if (error) throw error;
+          form.reset();
+          await loadDailyCashReport();
+          toast('Cash expense recorded');
+        } catch (error) {
+          console.error('Cash expense could not be recorded:', error);
+          toast(`Cash expense could not be recorded: ${describeDatabaseError(error)}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+      $('#cash-expense-list').addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-void-expense]');
+        if (!button || !window.confirm('Void this cash expense? The closing balance will be recalculated.')) return;
+        button.disabled = true;
+        try {
+          const { error } = await db.rpc('void_cash_expense', { p_expense_id: button.dataset.voidExpense });
+          if (error) throw error;
+          await loadDailyCashReport();
+          toast('Expense voided and balance recalculated');
+        } catch (error) {
+          console.error('Cash expense could not be voided:', error);
+          toast(`Expense could not be voided: ${describeDatabaseError(error)}`);
+          button.disabled = false;
+        }
+      });
+      function csvValue(value) {
+        let text = String(value ?? '');
+        if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+        return `"${text.replace(/"/g, '""')}"`;
+      }
+      $('#report-export').addEventListener('click', () => {
+        if (!dailyCashReport) {
+          toast('Load the daily report before exporting it.');
+          return;
+        }
+        const report = dailyCashReport;
+        const rows = [
+          ['Highway Bites Daily Report', report.business_date],
+          ['Online sales', report.online_sales],
+          ['Offline sales', report.offline_sales],
+          ['Total sales', Number(report.online_sales) + Number(report.offline_sales)],
+          ['Opening cash', report.opening_balance_set ? report.opening_balance : 'Not set'],
+          ['Counter cash collected', report.offline_cash_collected],
+          ['Delivered COD cash collected', report.online_cod_collected],
+          ['Cash expenses', report.cash_expenses],
+          ['Expected closing cash', report.opening_balance_set ? report.closing_balance : 'Opening balance not set'],
+          [],
+          ['Cash expenses', 'Amount', 'Time'],
+          ...(Array.isArray(report.expenses) ? report.expenses.map((expense) => [expense.note, expense.amount, new Date(expense.created_at).toLocaleString()]) : [])
+        ];
+        const csv = rows.map((row) => row.map(csvValue).join(',')).join('\r\n');
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `highway-bites-daily-${report.business_date}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
       async function loadOrders() {
         try {
           if (!db) throw new Error('Supabase has not been configured.');
           const { data, error } = await db.from('orders').select('*').order('created_at', { ascending: false }).limit(100);
           if (error) throw error;
           orders = data || [];
-          renderOrders();
+          try {
+            await loadDailyCashReport();
+          } catch (reportError) {
+            dailyCashReport = null;
+            renderOrders();
+            console.error('Daily cash report could not be loaded:', reportError);
+            toast(`Daily report unavailable: ${describeDatabaseError(reportError)}. Run daily-cash-report-migration.sql.`);
+          }
         } catch (error) {
           console.error('Unable to load orders:', error);
           toast(`Orders could not be loaded: ${describeDatabaseError(error)}`);
@@ -307,6 +512,20 @@
           await loadOrders();
         }
       });
+      $('#orders-list').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-print-order]');
+        if (!button) return;
+        const order = orders.find((entry) => entry.id === button.dataset.printOrder);
+        if (order) printCounterReceipt({
+          order_id: order.id,
+          customer_name: order.customer_name,
+          items: order.items,
+          total: order.total,
+          payment_method: order.payment_method,
+          service_type: order.service_type,
+          created_at: order.created_at
+        });
+      });
       $('#order-filter').addEventListener('change', renderOrders);
       $('#refresh-orders').addEventListener('click', loadOrders);
 
@@ -317,11 +536,109 @@
           if (error) throw error;
           menuItems = data || [];
           renderMenuItems();
+          renderPosMenu();
         } catch (error) {
           console.error('Unable to load menu items:', error);
           toast(`Menu could not be loaded: ${describeDatabaseError(error)}`);
         }
       }
+      function counterItemPrice(item) {
+        return Math.round(Number(item.price) * (100 - Number(item.discount_percent || 0))) / 100;
+      }
+      function renderPosMenu() {
+        const available = menuItems.filter((item) => item.is_available);
+        $('#pos-menu').innerHTML = available.length ? available.map((item) => `<button type="button" data-pos-add="${esc(item.id)}" class="flex items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white p-3 text-left transition hover:border-brand hover:bg-orange-50"><span class="min-w-0"><span class="block truncate text-sm font-bold">${esc(item.name)}</span><span class="text-xs text-gray-500">${esc(item.category)}</span></span><span class="shrink-0 text-right"><span class="block text-sm font-extrabold">${money(counterItemPrice(item))}</span>${Number(item.discount_percent) ? `<span class="text-[10px] font-bold text-red-600">${esc(item.discount_percent)}% OFF</span>` : ''}</span></button>`).join('') : '<p class="col-span-full rounded-xl bg-gray-50 p-4 text-sm text-gray-500">No available menu items to add.</p>';
+      }
+      function renderCounterCart() {
+        const lines = [...counterCart.values()];
+        $('#pos-cart').innerHTML = lines.length ? lines.map(({ item, quantity }) => `<div class="flex items-center justify-between gap-3 border-b border-gray-200 py-2 last:border-0"><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">${esc(item.name)}</p><p class="text-xs text-gray-500">${money(counterItemPrice(item))} each</p></div><div class="flex items-center gap-2"><button type="button" data-pos-change="${esc(item.id)}" data-delta="-1" class="grid h-8 w-8 place-items-center rounded-lg bg-white font-bold" aria-label="Remove one ${esc(item.name)}">−</button><span class="min-w-4 text-center text-sm font-bold">${quantity}</span><button type="button" data-pos-change="${esc(item.id)}" data-delta="1" class="grid h-8 w-8 place-items-center rounded-lg bg-white font-bold" aria-label="Add one ${esc(item.name)}">+</button><button type="button" data-pos-remove="${esc(item.id)}" class="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600" aria-label="Remove ${esc(item.name)} from bill"><i class="fa-solid fa-trash"></i></button></div><span class="w-20 text-right text-sm font-extrabold">${money(counterItemPrice(item) * quantity)}</span></div>`).join('') : '<p class="py-5 text-center text-sm text-gray-500">Tap an available item to add it to the bill.</p>';
+        $('#pos-total').textContent = money(lines.reduce((sum, { item, quantity }) => sum + counterItemPrice(item) * quantity, 0));
+        $('#pos-create-sale').disabled = !lines.length;
+      }
+      $('#pos-menu').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-pos-add]');
+        if (!button) return;
+        const item = menuItems.find((entry) => String(entry.id) === button.dataset.posAdd && entry.is_available);
+        if (!item) return;
+        const current = counterCart.get(String(item.id));
+        counterCart.set(String(item.id), { item, quantity: Math.min((current?.quantity || 0) + 1, 99) });
+        renderCounterCart();
+      });
+      $('#pos-cart').addEventListener('click', (event) => {
+        const removeButton = event.target.closest('[data-pos-remove]');
+        if (removeButton) {
+          counterCart.delete(removeButton.dataset.posRemove);
+          renderCounterCart();
+          return;
+        }
+        const changeButton = event.target.closest('[data-pos-change]');
+        if (!changeButton) return;
+        const key = changeButton.dataset.posChange;
+        const line = counterCart.get(key);
+        if (!line) return;
+        line.quantity += Number(changeButton.dataset.delta);
+        if (line.quantity <= 0) counterCart.delete(key);
+        else if (line.quantity <= 99) counterCart.set(key, line);
+        renderCounterCart();
+      });
+      function printCounterReceipt(receipt) {
+        if (!receipt) return;
+        try {
+          const serviceLabel = receipt.service_type === 'dine_in' ? 'Dine-in' : 'Takeaway / counter';
+          const paymentLabel = { cash: 'Cash', upi: 'UPI', card: 'Card' }[receipt.payment_method] || receipt.payment_method;
+          const lines = Array.isArray(receipt.items) ? receipt.items : [];
+          $('#receipt-print').innerHTML = `<div style="max-width:420px;margin:0 auto"><h1 style="margin:0 0 4px">Highway Bites</h1><p style="margin:0 0 18px;color:#555">Sales receipt · ${esc(serviceLabel)}</p><div class="receipt-row"><span>Bill</span><strong>#${esc(String(receipt.order_id).slice(0, 8).toUpperCase())}</strong></div><div class="receipt-row"><span>Date</span><span>${esc(new Date(receipt.created_at).toLocaleString())}</span></div><div class="receipt-row"><span>Customer</span><span>${esc(receipt.customer_name || 'Walk-in customer')}</span></div><div class="receipt-row"><span>Payment</span><span>${esc(paymentLabel)} · Paid</span></div><h2 style="margin:20px 0 4px">Items</h2>${lines.map((item) => `<div class="receipt-row"><span>${esc(item.quantity)} × ${esc(item.name)}${Number(item.discount_percent) ? ` (${esc(item.discount_percent)}% off)` : ''}</span><span>${money(Number(item.price) * Number(item.quantity))}</span></div>`).join('')}<p class="receipt-total">Total paid: ${money(receipt.total)}</p><p style="margin-top:28px;text-align:center;color:#555">Thank you! Visit Highway Bites again.</p></div>`;
+          document.body.classList.add('receipt-printing');
+          window.print();
+        } catch (error) {
+          console.error('Receipt could not be printed:', error);
+          toast(`Sale is saved, but printing failed. Use “Print last bill” to try again: ${error.message}`);
+        } finally {
+          window.setTimeout(() => {
+            document.body.classList.remove('receipt-printing');
+            $('#receipt-print').innerHTML = '';
+          }, 1000);
+        }
+      }
+      $('#pos-print-last').addEventListener('click', () => printCounterReceipt(lastCounterSale));
+      $('#pos-create-sale').addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        if (!counterCart.size) return;
+        const phone = $('#pos-customer-phone').value.trim();
+        if (phone && !/^[0-9]{7,15}$/.test(phone)) {
+          toast('Phone should be 7–15 digits, or leave it blank.');
+          return;
+        }
+        button.disabled = true;
+        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Recording sale…';
+        try {
+          const { data, error } = await db.rpc('create_counter_sale', {
+            p_items: [...counterCart.values()].map(({ item, quantity }) => ({ id: item.id, quantity })),
+            p_customer_name: $('#pos-customer-name').value.trim(),
+            p_phone: phone,
+            p_service_type: $('#pos-service-type').value,
+            p_payment_method: $('#pos-payment-method').value
+          });
+          if (error) throw error;
+          const receipt = Array.isArray(data) ? data[0] : data;
+          if (!receipt?.order_id) throw new Error('Sale was recorded but the receipt details were not returned. Refresh orders before retrying.');
+          lastCounterSale = receipt;
+          counterCart.clear();
+          $('#pos-customer-name').value = '';
+          $('#pos-customer-phone').value = '';
+          $('#pos-print-last').classList.remove('hidden');
+          renderCounterCart();
+          await loadOrders();
+          toast(`Offline sale saved · Bill #${String(receipt.order_id).slice(0, 8).toUpperCase()}`);
+          printCounterReceipt(receipt);
+        } catch (error) {
+          console.error('Offline sale could not be recorded:', error);
+          toast(`Sale could not be recorded: ${describeDatabaseError(error)}`);
+        } finally {
+          button.innerHTML = '<i class="fa-solid fa-receipt mr-2"></i>Record sale &amp; print bill';
+          button.disabled = counterCart.size === 0;
+        }
+      });
       function renderMenuItems() {
         $('#menu-admin-list').innerHTML = menuItems.length ? menuItems.map((item) => `<div class="flex items-center gap-3 py-3"><img class="h-12 w-12 rounded-lg bg-gray-100 object-cover" src="${esc(item.image_url || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=100&q=70')}" alt="" onerror="this.style.display='none'"><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">${esc(item.name)}</p><p class="text-xs text-gray-500">${money(Number(item.price) * (100 - Number(item.discount_percent || 0)) / 100)}${Number(item.discount_percent) ? ` <del>${money(item.price)}</del> · ${esc(item.discount_percent)}% OFF` : ''} · ${esc(item.category)} · <span class="${item.is_available ? 'text-green-600' : 'text-gray-400'}">${item.is_available ? 'Available' : 'Paused'}</span></p></div><button data-edit="${esc(item.id)}" class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-brand" aria-label="Edit ${esc(item.name)}"><i class="fa-solid fa-pen"></i></button><button data-delete-menu="${esc(item.id)}" class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600" aria-label="Remove ${esc(item.name)}" title="Remove item"><i class="fa-solid fa-trash"></i></button></div>`).join('') : '<p class="py-8 text-center text-sm text-gray-500">No menu items yet. Add the first one.</p>';
       }
@@ -495,11 +812,17 @@
           if (payload.eventType === 'INSERT') {
             if (!orders.some((order) => order.id === payload.new.id)) orders = [payload.new, ...orders].slice(0, 100);
             renderOrders();
+            loadDailyCashReport().catch((error) => {
+              console.error('Daily cash report could not be refreshed after a new order:', error);
+            });
             playAlert();
             toast(`New order from ${payload.new.customer_name || 'a customer'}!`);
           } else if (payload.eventType === 'UPDATE') {
             orders = orders.map((order) => order.id === payload.new.id ? payload.new : order);
             renderOrders();
+            loadDailyCashReport().catch((error) => {
+              console.error('Daily cash report could not be refreshed after an order update:', error);
+            });
           } else if (payload.eventType === 'DELETE') {
             orders = orders.filter((order) => order.id !== payload.old.id);
             renderOrders();
@@ -519,6 +842,7 @@
         await Promise.all([loadOrders(), loadMenu(), loadSettings(), loadDeliveryTeam()]);
         subscribeToOrders();
       }
+      renderCounterCart();
       if (db) {
         db.auth.getSession().then(async ({ data, error }) => {
           if (error) { console.error('Could not restore admin session:', error.message); return; }
